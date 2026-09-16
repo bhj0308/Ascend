@@ -1,0 +1,52 @@
+# Core Framework
+fastapi>=0.115,<1.0
+uvicorn[standard]>=0.32,<1.0
+python-dotenv>=1.0
+
+# Database
+sqlalchemy>=2.0.36,<3.0
+psycopg2-binary>=2.9.10
+alembic>=1.14,<2.0
+
+# Authentication & Security
+bcrypt>=4.0,<5.0
+PyJWT>=2.10,<3.0
+google-auth>=2.36
+
+# Validation & Serialization
+pydantic>=2.9,<3.0
+pydantic-settings>=2.6,<3.0
+email-validator>=2.2
+python-multipart>=0.0.18
+
+# Async & Background Jobs
+celery>=5.4,<6.0
+redis>=5.2,<6.0
+
+# HTTP & External APIs
+requests>=2.32
+httpx>=0.27
+
+# Email
+sendgrid>=6.11
+
+# Utilities
+python-dateutil>=2.9
+pytz>=2024.2
+
+# Testing
+pytest>=8.3
+pytest-asyncio>=0.24
+pytest-cov>=6.0
+
+# Code Quality
+black>=24.10
+isort>=5.13
+flake8>=7.1
+mypy>=1.13
+
+# Monitoring
+sentry-sdk>=2.19
+
+# Development
+ipython>=8.30

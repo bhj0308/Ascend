@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tech Talent Platform: Product & Architecture Plan</title>
+<style>
+  :root {
+    --text: #1a1a1a;
+    --bg: #ffffff;
+    --border: #e5e5e5;
+    --accent: #2563eb;
+    --accent-light: #dbeafe;
+    --success: #059669;
+    --warning: #d97706;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --text: #f5f5f5;
+      --bg: #1a1a1a;
+      --border: #404040;
+      --accent: #60a5fa;
+      --accent-light: #1e3a8a;
+      --success: #10b981;
+      --warning: #fbbf24;
+    }
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    line-height: 1.6;
+    color: var(--text);
+    background: var(--bg);
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  h1 { font-size: 2em; margin: 30px 0 10px; border-bottom: 3px solid var(--accent); padding-bottom: 10px; }
+  h2 { font-size: 1.5em; margin: 25px 0 10px; color: var(--accent); }
+  h3 { font-size: 1.1em; margin: 15px 0 8px; }
+
+  .section { margin: 30px 0; padding: 20px; background: var(--accent-light); border-radius: 8px; border-left: 4px solid var(--accent); }
+
+  table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+  th, td { padding: 12px; border: 1px solid var(--border); text-align: left; }
+  th { background: var(--accent); color: white; }
+
+  .phase { background: var(--accent-light); padding: 15px; margin: 10px 0; border-radius: 6px; border-left: 4px solid var(--accent); }
+
+  .feature { margin: 10px 0; padding: 10px; background: var(--bg); border-left: 3px solid var(--success); }
+
+  .user-flow { background: var(--bg); padding: 15px; margin: 10px 0; border: 1px solid var(--border); border-radius: 6px; }
+
+  ul { margin: 10px 0; padding-left: 20px; }
+  li { margin: 6px 0; }
+
+  .highlight { color: var(--accent); font-weight: bold; }
+  .success-text { color: var(--success); font-weight: bold; }
+
+  .tech-stack { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 15px 0; }
+  .tech-item { padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; }
+  .tech-item strong { display: block; color: var(--accent); margin-bottom: 5px; }
+
+  code { background: var(--border); padding: 2px 6px; border-radius: 3px; font-family: 'Courier New', monospace; }
+</style>
+</head>
+<body>
+
+<h1>🚀 Tech Talent Platform: Product & Architecture Plan</h1>
+
+<h2>1. Core Product Vision</h2>
+<div class="section">
+  <p><strong>Name:</strong> <span class="highlight">TalentFlow</span> (working title)</p>
+  <p><strong>Mission:</strong> Connect Korean-Canadian tech professionals and founders with global tech talent (starting Korea, expanding globally), with integrated employment support and cross-border payments.</p>
+  <p><strong>Core Loop:</strong> Hiring company posts → talent applies/gets referred → employment contract generated → team collaborates → seamless cross-border payments.</p>
+</div>
+
+<h2>2. User Personas & Entry Points</h2>
+<table>
+  <tr>
+    <th>User Persona</th>
+    <th>Goals</th>
+    <th>Pain Points</th>
+    <th>MVP Entry</th>
+  </tr>
+  <tr>
+    <td><strong>Tech Founder/CTO</strong><br/>(Korean-Canadian)</td>
+    <td>Hire quality engineers in Korea for 1/3 cost; avoid EOR middleman; fast hiring</td>
+    <td>No pre-vetted talent pool; employment law is complex; EOR costs $600+/mo</td>
+    <td>Post job → browse profiles → refer friends → hire</td>
+  </tr>
+  <tr>
+    <td><strong>IEC Working Holiday</strong><br/>(Korean in Canada)</td>
+    <td>Find tech job; make friends; understand visa/taxes; send money home</td>
+    <td>Jobs hidden in networks; isolation; no mentorship; confused about compliance</td>
+    <td>Job board → apply → connect with mentors → remit money</td>
+  </tr>
+  <tr>
+    <td><strong>Remote Engineer</strong><br/>(in Korea or elsewhere)</td>
+    <td>Work for Canadian company; flexible schedule; easy payments; understand taxes</td>
+    <td>Hard to find trustworthy employers; payment fees high; contract confusion</td>
+    <td>Profile → get matched → contract generated → receive payment</td>
+  </tr>
+  <tr>
+    <td><strong>Startup/SMB Hiring Manager</strong><br/>(non-Korean)</td>
+    <td>Access global talent; simple hiring flow; budget-friendly</td>
+    <td>Don't know how to hire internationally; afraid of compliance</td>
+    <td>Browse talent → guided hiring flow → contract templates</td>
+  </tr>
+  <tr>
+    <td><strong>Part-Time Job Seeker</strong><br/>(Immigrant, any background)</td>
+    <td>Find flexible work; fast hiring; simple process</td>
+    <td>Traditional job boards exclude part-time; language barriers</td>
+    <td>Browse gigs → apply → get paid → build portfolio</td>
+  </tr>
+</table>
+
+<h2>3. Product Layers (MVP → Scale)</h2>
+
+<h3>Layer 1: Core Marketplace (MVP - Phase 1: Weeks 1-6)</h3>
+<div class="phase">
+  <strong>Focus:</strong> Korean-Canadian founders hiring engineers in Korea, IEC job seekers<br/>
+  <strong>Scope:</strong> Minimal but complete loop
+
+  <h4>Features:</h4>
+  <div class="feature">✓ <strong>User Onboarding</strong>: Sign up as Founder/Engineer/IEC with 1-click auth (Google)</div>
+  <div class="feature">✓ <strong>Profile System</strong>: Basic profiles (name, role, skills, location, availability)</div>
+  <div class="feature">✓ <strong>Job Board</strong>: Founders post jobs (title, salary, role, visa sponsorship needed?)</div>
+  <div class="feature">✓ <strong>Browse & Apply</strong>: Engineers browse and apply to jobs</div>
+  <div class="feature">✓ <strong>Messaging</strong>: In-app chat between founders and engineers</div>
+  <div class="feature">✓ <strong>Referral System</strong>: "Refer a friend" button (send unique link)</div>
+  <div class="feature">✓ <strong>Knowledge Base</strong>: Public wiki with Korea-Canada employment basics (visa, tax, contracts)</div>
+</div>
+
+<h3>Layer 2: Employment Tooling (Phase 2: Weeks 7-12)</h3>
+<div class="phase">
+  <strong>Focus:</strong> Remove friction from hiring; make it legally safe
+
+  <h4>Features:</h4>
+  <div class="feature">✓ <strong>Contract Templates</strong>: 1-click contract generation (Korea engineer → Canada company, vice versa)</div>
+  <div class="feature">✓ <strong>Compliance Checklists</strong>: "Hiring from Korea" → step-by-step checklist (tax, visa, EOR)</div>
+  <div class="feature">✓ <strong>Offer Letter Generator</strong>: Auto-fill offer with salary, start date, role, benefits</div>
+  <div class="feature">✓ <strong>Tax & Visa Quick Ref</strong>: Simple guides (IEC rules, T1135 for employers, Korean employment law)</div>
+  <div class="feature">✓ <strong>E-signature</strong>: Sign contracts in-app (via DocuSign or similar)</div>
+</div>
+
+<h3>Layer 3: Payments & Remittance (Phase 2-3: Weeks 10-16)</h3>
+<div class="phase">
+  <strong>Focus:</strong> One-click cross-border payments with context
+
+  <h4>Features:</h4>
+  <div class="feature">✓ <strong>Payment Directory</strong>: "Pay engineer in Korea" vs. "Send money to family"</div>
+  <div class="feature">✓ <strong>Wise Integration</strong>: Embedded Wise API (low fees, real rates)</div>
+  <div class="feature">✓ <strong>Invoicing</strong>: Simple invoice system (especially for contractors)</div>
+  <div class="feature">✓ <strong>Payment History</strong>: Searchable log (for tax purposes)</div>
+  <div class="feature">✓ <strong>Currency Conversion</strong>: Real-time CAD ↔ KRW rates</div>
+</div>
+
+<h3>Layer 4: Community & Support (Phase 3: Weeks 16-20)</h3>
+<div class="phase">
+  <strong>Focus:</strong> Build network stickiness; reduce support burden
+
+  <h4>Features:</h4>
+  <div class="feature">✓ <strong>Community Forum/Slack</strong>: Korean-Canadian tech professionals network</div>
+  <div class="feature">✓ <strong>Mentorship Matching</strong>: IEC workers matched with Korean-Canadian mentors</div>
+  <div class="feature">✓ <strong>Job Success Stories</strong>: "How I got hired" profiles (builds trust)</div>
+  <div class="feature">✓ <strong>Email Digests</strong>: Weekly "jobs near you," "mentors available," "tax deadline reminder"</div>
+</div>
+
+<h3>Layer 5: Global Expansion (Phase 4: Post-MVP)</h3>
+<div class="phase">
+  <strong>Focus:</strong> Same model for other countries
+
+  <h4>Features:</h4>
+  <div class="feature">→ India, Philippines, Taiwan, China talent → Canadian hiring</div>
+  <div class="feature">→ Canadian freelancers → Remote work worldwide</div>
+  <div class="feature">→ Multi-country payroll (Deel integration as fallback for complex cases)</div>
+</div>
+
+<h2>4. User Flows (MVP)</h2>
+
+<h3>Flow 1: Founder Posting a Job</h3>
+<div class="user-flow">
+  1. Sign up with Google (first-time: select "I'm hiring")<br/>
+  2. Complete profile (company, role, industry, hiring needs)<br/>
+  3. Click "Post a Job"<br/>
+  4. Fill form: title, salary range, skills, visa sponsorship?, # positions<br/>
+  5. Get auto-generated warning if hiring internationally ("Read: Korea employment guide")<br/>
+  6. Publish job<br/>
+  7. Job appears on board; get email notifications when people apply<br/>
+  8. Message candidates; share contract template; use in-app e-signature
+</div>
+
+<h3>Flow 2: IEC Worker Applying</h3>
+<div class="user-flow">
+  1. Sign up with Google (first-time: select "I'm looking for work" + "IEC visa status")<br/>
+  2. Complete profile (skills, location, visa timeline, languages, availability)<br/>
+  3. Browse "Tech Jobs in Canada"<br/>
+  4. See filter: "Sponsor IEC? Yes" or "Canadian citizen required"<br/>
+  5. Apply to jobs matching visa status<br/>
+  6. Chat with founder; ask about visa support<br/>
+  7. Receive offer; sign contract in-app<br/>
+  8. Start work; get prompt to set up payment method (Wise link)<br/>
+  9. Receive first payment; gets reminder to file T1135 if assets > $100k
+</div>
+
+<h3>Flow 3: Mentorship Setup</h3>
+<div class="user-flow">
+  1. IEC worker fills profile: "I'd like a mentor"<br/>
+  2. System suggests matching Korean-Canadian professionals<br/>
+  3. Mentor gets notification; can accept/decline<br/>
+  4. Monthly 1-on-1 meeting link auto-generated (Calendly or similar)<br/>
+  5. Built-in questions: visa questions, job search, culture adaptation
+</div>
+
+<h2>5. Technical Architecture</h2>
+
+<h3>Tech Stack</h3>
+<div class="tech-stack">
+  <div class="tech-item">
+    <strong>Frontend</strong>
+    React 18 + TypeScript<br/>
+    Tailwind CSS<br/>
+    TanStack Query (data fetching)<br/>
+    Zustand (state)<br/>
+    Mobile-first responsive
+  </div>
+
+  <div class="tech-item">
+    <strong>Backend</strong>
+    Python FastAPI<br/>
+    PostgreSQL (relational data)<br/>
+    Redis (cache, sessions)<br/>
+    Celery (async jobs: emails, payments)
+  </div>
+
+  <div class="tech-item">
+    <strong>Infrastructure</strong>
+    Docker containers<br/>
+    AWS or Render.com (hosting)<br/>
+    GitHub Actions (CI/CD)<br/>
+    Sentry (error tracking)
+  </div>
+
+  <div class="tech-item">
+    <strong>Integrations</strong>
+    Google OAuth (auth)<br/>
+    Wise API (payments)<br/>
+    SendGrid/Resend (email)<br/>
+    DocuSign (e-signatures)
+  </div>
+</div>
+
+<h3>Database Schema (Core Entities)</h3>
+<pre><code>
+Users
+├─ id, email, auth_provider, created_at
+├─ profile: { name, role, bio, location, avatar }
+├─ user_type: enum(Founder, Engineer, IEC_Worker, Immigrant)
+
+Jobs
+├─ id, creator_id (founder), title, description, salary_min, salary_max
+├─ skills: array, visa_sponsorship: bool, job_type: enum(Full-time, Part-time, Contract)
+├─ created_at, status: enum(Open, Closed, Filled)
+
+Applications
+├─ id, job_id, user_id, status: enum(Applied, Reviewing, Offered, Rejected, Hired)
+├─ created_at, updated_at, notes
+
+Contracts
+├─ id, job_id or application_id
+├─ template_type: enum(Korea_Engineer_Canada_Co, Remote_Contractor, etc)
+├─ terms: { salary, start_date, end_date, benefits, termination }
+├─ signed_at, signature_status: enum(Draft, Pending, Signed)
+
+Payments
+├─ id, from_user_id, to_user_id, amount, currency, payment_type: enum(Salary, Remittance, Gig)
+├─ status: enum(Pending, Processing, Complete, Failed)
+├─ wise_transaction_id, created_at
+
+Mentorships
+├─ id, mentor_id, mentee_id, status: enum(Active, Completed)
+├─ created_at, meeting_schedule
+</code></pre>
+
+<h3>API Structure (FastAPI endpoints)</h3>
+<pre><code>
+/auth
+  POST /signup
+  POST /login
+  POST /logout
+
+/profile
+  GET /me
+  PUT /me
+  GET /:user_id
+
+/jobs
+  GET /browse (filters: skills, location, visa_sponsorship, salary_range)
+  POST / (create job)
+  PUT /:job_id
+  DELETE /:job_id
+  GET /:job_id/applications
+
+/applications
+  POST / (apply to job)
+  GET /me (my applications)
+  PUT /:application_id (status updates)
+
+/contracts
+  POST / (generate from template)
+  GET /:contract_id
+  PUT /:contract_id (e-signature)
+  GET /templates
+
+/payments
+  POST / (initiate payment via Wise)
+  GET /me/history
+  GET /:payment_id/status
+
+/mentorship
+  GET /available_mentors (with filters)
+  POST / (request mentorship)
+  PUT /:mentorship_id (accept/reject)
+
+/knowledge
+  GET /guides (wiki articles)
+  GET /guides/:topic
+</code></pre>
+
+<h2>6. Data Flow Diagram (Simplified)</h2>
+<pre>
+┌─────────────────────────────────────────────────────────┐
+│              TALENTFLOW PLATFORM                        │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│  ┌──────────────┐      ┌────────────────┐             │
+│  │ Founder App  │      │  Engineer App  │             │
+│  │ (Post Jobs)  │◄────►│  (Apply/Work)  │             │
+│  └──────┬───────┘      └────────┬───────┘             │
+│         │                       │                     │
+│         └───────────┬───────────┘                     │
+│                     ▼                                 │
+│            ┌────────────────┐                         │
+│            │  Backend API   │                         │
+│            │  (FastAPI)     │                         │
+│            └───┬────────┬───┘                         │
+│                │        │                            │
+│     ┌──────────▼─┐  ┌───▼──────────┐                 │
+│     │ PostgreSQL │  │ Redis Cache  │                 │
+│     └────────────┘  └──────────────┘                 │
+│                                                      │
+│    ┌──────────────────────────────────────┐          │
+│    │  External Services (Integrations)    │          │
+│    │  - Wise API (Payments)               │          │
+│    │  - Google OAuth                      │          │
+│    │  - DocuSign (Contracts)              │          │
+│    │  - SendGrid (Email)                  │          │
+│    └──────────────────────────────────────┘          │
+│                                                      │
+└─────────────────────────────────────────────────────────┘
+</pre>
+
+<h2>7. Feature Priority Matrix (MVP vs. Later)</h2>
+
+<table>
+  <tr>
+    <th>Feature</th>
+    <th>Priority</th>
+    <th>Timeline</th>
+    <th>Effort</th>
+  </tr>
+  <tr>
+    <td>Basic job board + apply</td>
+    <td><span class="highlight">Critical</span></td>
+    <td>Week 1-2</td>
+    <td>Medium</td>
+  </tr>
+  <tr>
+    <td>User profiles (founder + engineer)</td>
+    <td><span class="highlight">Critical</span></td>
+    <td>Week 1-2</td>
+    <td>Medium</td>
+  </tr>
+  <tr>
+    <td>In-app messaging</td>
+    <td><span class="highlight">Critical</span></td>
+    <td>Week 3-4</td>
+    <td>Medium</td>
+  </tr>
+  <tr>
+    <td>Referral system</td>
+    <td><span class="success-text">High</span></td>
+    <td>Week 2-3</td>
+    <td>Low</td>
+  </tr>
+  <tr>
+    <td>Contract templates + e-signature</td>
+    <td><span class="success-text">High</span></td>
+    <td>Week 5-6</td>
+    <td>High</td>
+  </tr>
+  <tr>
+    <td>Wise payment integration</td>
+    <td><span class="success-text">High</span></td>
+    <td>Week 7-9</td>
+    <td>Medium</td>
+  </tr>
+  <tr>
+    <td>Knowledge base (wiki)</td>
+    <td><span class="success-text">High</span></td>
+    <td>Week 4-6</td>
+    <td>Low</td>
+  </tr>
+  <tr>
+    <td>Email notifications</td>
+    <td>Medium</td>
+    <td>Week 8-9</td>
+    <td>Low</td>
+  </tr>
+  <tr>
+    <td>Mentorship matching</td>
+    <td>Medium</td>
+    <td>Week 10-12</td>
+    <td>Medium</td>
+  </tr>
+  <tr>
+    <td>Community Slack/Forum</td>
+    <td>Medium</td>
+    <td>Week 12-16</td>
+    <td>Low</td>
+  </tr>
+  <tr>
+    <td>Multi-country expansion</td>
+    <td>Low</td>
+    <td>Post-MVP</td>
+    <td>High</td>
+  </tr>
+</table>
+
+<h2>8. Revenue Model</h2>
+
+<table>
+  <tr>
+    <th>Stream</th>
+    <th>Customer</th>
+    <th>Price</th>
+    <th>Timeline</th>
+  </tr>
+  <tr>
+    <td><strong>Premium Membership</strong><br/>(Founders/Hiring Companies)</td>
+    <td>Companies posting jobs</td>
+    <td>$20-30/month (or $199/year)</td>
+    <td>Phase 2 (after 50+ jobs posted)</td>
+  </tr>
+  <tr>
+    <td><strong>Wise Affiliate</strong><br/>(Payment Commissions)</td>
+    <td>Every payment made via Wise</td>
+    <td>2-3% of transaction</td>
+    <td>Phase 3 (when payments start)</td>
+  </tr>
+  <tr>
+    <td><strong>Sponsored Job Listings</strong><br/>(Featured jobs)</td>
+    <td>Companies wanting visibility</td>
+    <td>$50-100 per featured listing</td>
+    <td>Phase 4 (maturity)</td>
+  </tr>
+  <tr>
+    <td><strong>Consulting/Done-for-You</strong><br/>(Employment setup)</td>
+    <td>Companies needing help</td>
+    <td>$200-500 per setup</td>
+    <td>Phase 4 (scale)</td>
+  </tr>
+  <tr>
+    <td><strong>Verified Badge</strong><br/>(Premium profiles for engineers)</td>
+    <td>Top engineers, freelancers</td>
+    <td>$5/month or $40/year</td>
+    <td>Phase 4 (later)</td>
+  </tr>
+</table>
+
+<h2>9. Go-to-Market: First 100 Users</h2>
+
+<h3>Weeks 1-2: Closed Beta (30 users)</h3>
+<ul>
+  <li><strong>Target:</strong> Your personal network (Korean-Canadian founders, IEC friends, developer contacts)</li>
+  <li><strong>Strategy:</strong> Direct outreach via KakaoTalk, email, in-person meetups</li>
+  <li><strong>Goal:</strong> Find 5-10 founders willing to post jobs, 20-30 engineers to browse</li>
+  <li><strong>Feedback:</strong> Weekly 1-on-1s; iterate on UX</li>
+</ul>
+
+<h3>Weeks 3-4: Warm Launch (100+ users)</h3>
+<ul>
+  <li><strong>Target:</strong> Korean-Canadian tech communities (church, cultural centers, tech meetups)</li>
+  <li><strong>Strategy:</strong> Post in Korean-Canadian Slack/Discord channels, church bulletin boards, tech events</li>
+  <li><strong>Message:</strong> "A job board for Korean tech people (hiring + working in Canada)"</li>
+  <li><strong>Goal:</strong> 10-15 jobs posted, 100+ engineers browsing, first hires</li>
+</ul>
+
+<h3>Weeks 5-6: Expand Reach (500+ users)</h3>
+<ul>
+  <li><strong>Target:</strong> IEC Facebook groups, Korean community online forums (Daum cafe, Naver)</li>
+  <li><strong>Strategy:</strong> Share success stories ("I got hired in 2 weeks!"), post in IEC groups</li>
+  <li><strong>Goal:</strong> Network effects kick in; referrals grow; 30+ jobs, 500+ users</li>
+</ul>
+
+<h2>10. Build Timeline (20 weeks to MVP)</h2>
+
+<table>
+  <tr>
+    <th>Phase</th>
+    <th>Weeks</th>
+    <th>Key Deliverables</th>
+    <th>Go-to-Market</th>
+  </tr>
+  <tr>
+    <td><strong>Phase 1:</strong><br/>Core Marketplace</td>
+    <td>1-6</td>
+    <td>Job board, profiles, apply, messaging, knowledge base</td>
+    <td>Closed beta (personal network)</td>
+  </tr>
+  <tr>
+    <td><strong>Phase 2:</strong><br/>Employment Tooling</td>
+    <td>7-12</td>
+    <td>Contracts, checklists, tax/visa guides, e-signature</td>
+    <td>Warm launch (Korean communities)</td>
+  </tr>
+  <tr>
+    <td><strong>Phase 3:</strong><br/>Payments + Community</td>
+    <td>13-18</td>
+    <td>Wise integration, invoicing, mentorship, forum</td>
+    <td>Paid tier available</td>
+  </tr>
+  <tr>
+    <td><strong>Phase 4:</strong><br/>Polish & Launch</td>
+    <td>19-20</td>
+    <td>Bug fixes, analytics, email campaigns, public launch</td>
+    <td>Public launch; PR in tech/community media</td>
+  </tr>
+</table>
+
+<h2>11. Success Metrics (MVP)</h2>
+
+<table>
+  <tr>
+    <th>Metric</th>
+    <th>Target (End of Week 20)</th>
+    <th>Why It Matters</th>
+  </tr>
+  <tr>
+    <td><strong>Users</strong></td>
+    <td>500+ (founders + engineers)</td>
+    <td>Critical mass for network effects</td>
+  </tr>
+  <tr>
+    <td><strong>Jobs Posted</strong></td>
+    <td>30-50</td>
+    <td>Supply on platform</td>
+  </tr>
+  <tr>
+    <td><strong>Successful Hires</strong></td>
+    <td>5-10</td>
+    <td>Proof of product-market fit</td>
+  </tr>
+  <tr>
+    <td><strong>Monthly Active Users</strong></td>
+    <td>40%+ of registered</td>
+    <td>Engagement signal</td>
+  </tr>
+  <tr>
+    <td><strong>Payment Volume</strong></td>
+    <td>$50k+ (Wise transactions)</td>
+    <td>Revenue + proof of trust</td>
+  </tr>
+  <tr>
+    <td><strong>Referral Rate</strong></td>
+    <td>20%+ new users from referrals</td>
+    <td>Organic growth signal</td>
+  </tr>
+</table>
+
+<h2>12. Key Risks & Mitigations</h2>
+
+<table>
+  <tr>
+    <th>Risk</th>
+    <th>Mitigation</th>
+  </tr>
+  <tr>
+    <td>People don't trust unproven platform for hiring</td>
+    <td>Start with your network; use social proof (success stories, profiles with photos + reviews)</td>
+  </tr>
+  <tr>
+    <td>Employment law compliance is complex; liability</td>
+    <td>Partner with 1 Korean-Canadian accountant early; have them review contracts + guidance</td>
+  </tr>
+  <tr>
+    <td>Network effects are slow to kick in</td>
+    <td>Hand-curate first 50 users; actively refer jobs to engineers; incentivize sharing</td>
+  </tr>
+  <tr>
+    <td>Wise integration delayed or breaks</td>
+    <td>Have fallback: Stripe for initial MVP; prioritize Wise integration after launch</td>
+  </tr>
+  <tr>
+    <td>Competitors enter (LinkedIn Jobs, Upwork, Deel)</td>
+    <td>Our moat is Korean-Canadian community + Korea expertise. Lock in users with mentorship + trust</td>
+  </tr>
+</table>
+
+<h2>13. Next Steps</h2>
+
+<ol>
+  <li><strong>Validate with 5 founders:</strong> "Would you pay $20/mo to hire engineers from Korea without EOR middleman?"</li>
+  <li><strong>Validate with 5 IEC workers:</strong> "Would you use a job board specifically for Korean tech?"</li>
+  <li><strong>Interview 1 Korean-Canadian accountant:</strong> Review contract templates, get sign-off on tax/visa guidance</li>
+  <li><strong>Set up tech foundation:</strong> GitHub repo, Render database, CI/CD pipeline</li>
+  <li><strong>Design lo-fi prototypes:</strong> Figma wireframes for job board, apply flow, profile</li>
+  <li><strong>Start building Phase 1:</strong> Backend API, frontend, basic auth</li>
+</ol>
+
+</body>
+</html>

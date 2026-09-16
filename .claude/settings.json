@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(wc *)",
+      "Bash(grep *)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git branch)",
+      "Bash(git branch -a)",
+      "Bash(git branch --show-current)",
+      "Bash(black --check *)",
+      "Bash(isort --check-only *)",
+      "Bash(npm run build)",
+      "Bash(npm run lint)",
+      "Bash(npm run test)",
+      "Bash(pytest*)",
+      "Bash(alembic current*)",
+      "Bash(alembic history*)",
+      "Bash(pg_isready*)",
+      "Bash(curl localhost*)",
+      "Bash(curl -s localhost*)",
+      "Bash(curl -sf localhost*)",
+      "Bash(curl http://localhost*)",
+      "Bash(curl -s http://localhost*)",
+      "Bash(cd *)",
+      "Bash(source venv/bin/activate)",
+      "Bash(source backend/venv/bin/activate)"
+    ]
+  }
+}
