@@ -38,3 +38,26 @@ export async function getMe(): Promise<User> {
   const { data } = await api.get<User>('/auth/me')
   return data
 }
+
+export async function forgotPassword(email: string): Promise<{ detail: string }> {
+  const { data } = await api.post<{ detail: string }>('/auth/forgot-password', { email })
+  return data
+}
+
+export async function resetPassword(token: string, newPassword: string): Promise<{ detail: string }> {
+  const { data } = await api.post<{ detail: string }>('/auth/reset-password', {
+    token,
+    new_password: newPassword,
+  })
+  return data
+}
+
+export async function sendVerification(): Promise<{ detail: string }> {
+  const { data } = await api.post<{ detail: string }>('/auth/send-verification')
+  return data
+}
+
+export async function verifyEmail(token: string): Promise<{ detail: string }> {
+  const { data } = await api.post<{ detail: string }>('/auth/verify-email', { token })
+  return data
+}

@@ -56,6 +56,14 @@ class Settings(BaseSettings):
     SENDGRID_API_KEY: str = ""
     SENDGRID_FROM_EMAIL: str = "noreply@ascendtalent.com"
 
+    # Frontend origin used to build links in emails (password reset, verify email)
+    APP_BASE_URL: str = "http://localhost:5173"
+    PASSWORD_RESET_EXPIRE_MINUTES: int = 60
+    EMAIL_VERIFY_EXPIRE_HOURS: int = 24
+
+    # Rate limiting on /auth/* — disable only for tests (see .env.example)
+    RATE_LIMIT_ENABLED: bool = True
+
     # Wise (Cross-border payments)
     WISE_API_KEY: str = ""
     WISE_API_URL: str = "https://api.wise.com"

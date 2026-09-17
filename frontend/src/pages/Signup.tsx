@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
+import axios from 'axios'
 import { signup, login, getMe } from '@/services/auth'
 import { useAuthStore } from '@/store/authStore'
 import type { UserType } from '@/types'
@@ -11,6 +12,17 @@ const USER_TYPES: { value: UserType; label: string }[] = [
   { value: 'iec_worker', label: "I'm on a working holiday (IEC)" },
   { value: 'immigrant', label: "I'm an immigrant looking for work" },
 ]
+
+// Distinguish "the API said no" from "the request never got there" — the latter is
+// almost always a deployment config problem (VITE_API_URL / CORS), not user error.
+function describeError(error: unknown, fallback: string): string {
+  if (axios.isAxiosError(error)) {
+    if (!error.response) return 'Could not reach the server. Please try again in a moment.'
+    const detail = (error.response.data as { detail?: unknown } | undefined)?.detail
+    if (typeof detail === 'string') return detail
+  }
+  return fallback
+}
 
 export function Signup() {
   const navigate = useNavigate()
@@ -110,7 +122,9 @@ export function Signup() {
           {mutation.isPending ? 'Creating account…' : 'Sign up'}
         </button>
         {mutation.isError && (
-          <p className="text-sm text-red-600">Could not create account. Email may already be in use.</p>
+          <p className="text-sm text-red-600">
+            {describeError(mutation.error, 'Could not create account.')}
+          </p>
         )}
       </form>
 

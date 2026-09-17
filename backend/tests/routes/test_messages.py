@@ -136,3 +136,20 @@ def test_thread_with_user_visible_to_third_party_is_empty_not_forbidden(
     )
     assert resp.status_code == 200, resp.text
     assert resp.json() == []
+
+
+def _deactivate(client, user):
+    resp = client.request(
+        "DELETE",
+        "/api/profile/me",
+        json={"password": "hunter22"},
+        headers=user["headers"],
+    )
+    assert resp.status_code == 204, resp.text
+
+
+def test_send_message_to_deleted_account_rejected(client, founder, other_user):
+    _deactivate(client, other_user)
+    resp = _send(client, founder, other_user["user_id"], body="hello?")
+    assert resp.status_code == 400, resp.text
+    assert "no longer active" in resp.json()["detail"]

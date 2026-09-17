@@ -58,9 +58,12 @@ export function Privacy() {
         <section>
           <h2 className="font-semibold text-gray-900">Your choices</h2>
           <p>
-            You can edit your profile at any time. To delete your account and data, email
-            <span className="font-mono"> privacy@[your-domain]</span> (placeholder) — self-serve
-            deletion is planned.
+            You can edit your profile at any time. You can delete your account yourself from the
+            Profile page: your personal details (name, email, bio, skills, location, visa status)
+            are removed and sign-in is disabled. Contracts, payment records, and messages that
+            other users are party to are kept, attributed to an anonymous "User #id", because
+            they are the other party's records too. Questions:{' '}
+            <span className="font-mono">privacy@[your-domain]</span> (placeholder).
           </p>
         </section>
         <section>

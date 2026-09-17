@@ -1,6 +1,6 @@
 """Mentorship routes: request, and the accept/decline/complete lifecycle."""
 
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import and_, or_
@@ -9,12 +9,13 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.dependencies import get_current_user
 from app.models.mentorship import Mentorship, MentorshipStatus
-from app.models.user import User
+from app.models.user import User, UserStatus
 from app.schemas.mentorship import (
     MentorshipCreate,
     MentorshipResponse,
     build_mentorship_response,
 )
+from app.schemas.user import PublicUserResponse
 
 router = APIRouter()
 
@@ -39,6 +40,50 @@ def get_my_mentorships(
     return [build_mentorship_response(m) for m in mentorships]
 
 
+@router.get("/mentors", response_model=List[PublicUserResponse])
+def list_mentors(
+    skill: Optional[str] = None,
+    country: Optional[str] = None,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """List available mentors, newest first, max 50. Excludes the caller.
+
+    `skill` matches case-insensitively against any entry of the user's JSON
+    `skills` array; `country` is an exact case-insensitive match. Both
+    filters are applied in Python after the DB query -- fine at this scale
+    (mentor pool is small); replace with SQL filtering if it grows.
+    """
+    mentors = (
+        db.query(User)
+        .filter(
+            User.mentor_available == True,  # noqa: E712
+            User.status == UserStatus.ACTIVE,
+            User.id != current_user.id,
+        )
+        .order_by(User.created_at.desc())
+        .all()
+    )
+
+    if skill:
+        skill_lower = skill.lower()
+        mentors = [
+            mentor
+            for mentor in mentors
+            if mentor.skills and any(skill_lower in s.lower() for s in mentor.skills)
+        ]
+
+    if country:
+        country_lower = country.lower()
+        mentors = [
+            mentor
+            for mentor in mentors
+            if mentor.country and mentor.country.lower() == country_lower
+        ]
+
+    return mentors[:50]
+
+
 @router.post("", response_model=MentorshipResponse, status_code=201)
 def create_mentorship(
     payload: MentorshipCreate,
@@ -54,6 +99,10 @@ def create_mentorship(
     mentor = db.query(User).filter(User.id == payload.mentor_id).first()
     if not mentor:
         raise HTTPException(status_code=404, detail="Mentor not found")
+    if mentor.status != UserStatus.ACTIVE:
+        raise HTTPException(
+            status_code=400, detail="This user's account is no longer active"
+        )
     if payload.mentor_id == current_user.id:
         raise HTTPException(
             status_code=400, detail="Cannot request a mentorship with yourself"
@@ -129,6 +178,11 @@ def accept_mentorship(
     if mentorship.status != MentorshipStatus.REQUESTED:
         raise HTTPException(
             status_code=400, detail="Only requested mentorships can be accepted"
+        )
+
+    if mentorship.mentee.status != UserStatus.ACTIVE:
+        raise HTTPException(
+            status_code=400, detail="The mentee's account is no longer active"
         )
 
     mentorship.status = MentorshipStatus.ACTIVE

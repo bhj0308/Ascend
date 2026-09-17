@@ -12,6 +12,7 @@ alembic>=1.14,<2.0
 bcrypt>=4.0,<5.0
 PyJWT>=2.10,<3.0
 google-auth>=2.36
+slowapi>=0.1.9,<0.2
 
 # Validation & Serialization
 pydantic>=2.9,<3.0

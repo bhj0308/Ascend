@@ -47,6 +47,10 @@ console and blank pages.
 | `CORS_ORIGINS` | API | comma-separated frontend origin(s), e.g. `https://ascend-web.onrender.com` |
 | `ALLOWED_HOSTS` | API | comma-separated API hostnames, e.g. `ascend-api.onrender.com` |
 | `VITE_API_URL` | static site | `https://<api-host>/api` (baked in at build time — redeploy after changing) |
+| `APP_BASE_URL` | API | the frontend's real URL — used to build password-reset and email-verification links |
+| `SENDGRID_API_KEY` | API | optional; **blank = emails are printed to the API log instead of sent** (find reset links there) |
+| `SENDGRID_FROM_EMAIL` | API | sender address once SendGrid is configured (must be a verified sender there) |
+| `RATE_LIMIT_ENABLED` | API | default `true`; only tests set it to `false` |
 | `SENTRY_DSN` | API | optional; blank disables error tracking |
 
 Placeholders that are wired but inert until you add credentials:
@@ -73,10 +77,12 @@ tested downgrade path.
 
 ## 6. Known limitations at launch (no external input needed to fix later)
 
-- **No password reset / email verification** — email sending isn't wired. Users who forget
-  a password need manual help until this ships.
+- **Emails only go out once `SENDGRID_API_KEY` is set.** Until then, password-reset and
+  verification links are printed to the API log (Render → `ascend-api` → Logs) — usable for
+  early testers, not for the public.
 - **Refresh tokens are stateless** — logout clears the browser but a stolen refresh token
   stays valid until it expires (7 days). Add a revocation table before handling anything sensitive.
+- **Rate limiting is in-memory** — fine for the single free-tier instance; move it to Redis
+  before running more than one instance.
 - **Free tier**: API sleeps when idle; Postgres expires after 90 days; single instance only.
-- **No rate limiting** on `/auth/*`.
 - Terms and Privacy pages are drafts marked as such in the UI.

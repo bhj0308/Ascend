@@ -1,6 +1,9 @@
 """Shared pytest fixtures: test DB, test client, and auth helpers."""
 
 import os
+
+os.environ.setdefault("RATE_LIMIT_ENABLED", "false")
+
 import time
 
 import pytest

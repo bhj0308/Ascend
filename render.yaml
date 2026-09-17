@@ -35,12 +35,23 @@ services:
           property: connectionString
       - key: SECRET_KEY
         generateValue: true
-      # Must match the static site's URL below (update if you rename it or add a domain).
+      # The static site's real URL (Render appended the suffix). Comma-separate if you
+      # add a custom domain. Keep CORS_ORIGINS and APP_BASE_URL in sync.
       - key: CORS_ORIGINS
-        value: https://ascend-web.onrender.com
+        value: https://ascend-web-irk7.onrender.com
+      # Wildcard so the API accepts whatever suffixed hostname Render assigns it.
       - key: ALLOWED_HOSTS
-        value: ascend-api.onrender.com,localhost
+        value: "*.onrender.com,localhost"
+      # Frontend origin used in password-reset / verification email links. Same value as
+      # CORS_ORIGINS (the static site's real URL) — update both together.
+      - key: APP_BASE_URL
+        value: https://ascend-web-irk7.onrender.com
       # Optional integrations — set in the dashboard when you have them; blank = disabled.
+      # Without SENDGRID_API_KEY, emails are printed to the API's log instead of sent.
+      - key: SENDGRID_API_KEY
+        sync: false
+      - key: SENDGRID_FROM_EMAIL
+        value: noreply@ascendtalent.com
       - key: SENTRY_DSN
         sync: false
       - key: SENTRY_ENVIRONMENT
@@ -58,5 +69,7 @@ services:
         source: /*
         destination: /index.html
     envVars:
+      # The API's real URL + /api. Baked in at build time: changing it requires a rebuild
+      # (Render redeploys the static site when a blueprint env var changes).
       - key: VITE_API_URL
-        value: https://ascend-api.onrender.com/api
+        value: https://ascend-api-onu3.onrender.com/api

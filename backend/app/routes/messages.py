@@ -14,7 +14,7 @@ from app.database import get_db
 from app.dependencies import get_current_user
 from app.models.job import Job
 from app.models.message import Message
-from app.models.user import User
+from app.models.user import User, UserStatus
 from app.schemas.message import (
     MessageCreate,
     MessageResponse,
@@ -42,6 +42,10 @@ def send_message(
     recipient = db.query(User).filter(User.id == payload.recipient_id).first()
     if not recipient:
         raise HTTPException(status_code=404, detail="Recipient not found")
+    if recipient.status != UserStatus.ACTIVE:
+        raise HTTPException(
+            status_code=400, detail="This user's account is no longer active"
+        )
 
     body = payload.body.strip()
     if not body:

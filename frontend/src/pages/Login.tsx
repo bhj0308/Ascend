@@ -1,8 +1,20 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
+import axios from 'axios'
 import { login, getMe } from '@/services/auth'
 import { useAuthStore } from '@/store/authStore'
+
+// Distinguish "the API said no" from "the request never got there" — the latter is
+// almost always a deployment config problem (VITE_API_URL / CORS), not user error.
+function describeError(error: unknown, fallback: string): string {
+  if (axios.isAxiosError(error)) {
+    if (!error.response) return 'Could not reach the server. Please try again in a moment.'
+    const detail = (error.response.data as { detail?: unknown } | undefined)?.detail
+    if (typeof detail === 'string') return detail
+  }
+  return fallback
+}
 
 export function Login() {
   const navigate = useNavigate()
@@ -59,9 +71,17 @@ export function Login() {
           {mutation.isPending ? 'Logging in…' : 'Log in'}
         </button>
         {mutation.isError && (
-          <p className="text-sm text-red-600">Incorrect email or password.</p>
+          <p className="text-sm text-red-600">
+            {describeError(mutation.error, 'Incorrect email or password.')}
+          </p>
         )}
       </form>
+
+      <p className="mt-4 text-sm text-gray-600">
+        <Link to="/forgot-password" className="text-primary-600 hover:underline">
+          Forgot password?
+        </Link>
+      </p>
 
       <p className="mt-4 text-sm text-gray-600">
         No account?{' '}

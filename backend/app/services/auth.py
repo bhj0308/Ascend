@@ -1,5 +1,6 @@
 """Authentication service: password hashing and JWT token management."""
 
+import hashlib
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
@@ -7,6 +8,7 @@ import bcrypt
 import jwt
 
 from app.config import get_settings
+from app.models.user import User
 
 settings = get_settings()
 
@@ -47,3 +49,36 @@ def decode_token(token: str) -> Optional[dict]:
         return jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
     except jwt.PyJWTError:
         return None
+
+
+def password_fingerprint(password_hash: Optional[str]) -> str:
+    """Short fingerprint of a password hash.
+
+    Embedded in password reset tokens so they are single-use by construction:
+    once the password changes, the fingerprint computed from the new hash no
+    longer matches the one baked into an already-issued token.
+    """
+    return hashlib.sha256((password_hash or "").encode("utf-8")).hexdigest()[:16]
+
+
+def create_password_reset_token(user: User) -> str:
+    """Create a JWT for POST /auth/reset-password."""
+    expire = datetime.now(timezone.utc) + timedelta(
+        minutes=settings.PASSWORD_RESET_EXPIRE_MINUTES
+    )
+    payload = {
+        "sub": str(user.id),
+        "type": "password_reset",
+        "exp": expire,
+        "pwd": password_fingerprint(user.password_hash),
+    }
+    return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+
+
+def create_email_verify_token(user_id: int) -> str:
+    """Create a JWT for POST /auth/verify-email."""
+    expire = datetime.now(timezone.utc) + timedelta(
+        hours=settings.EMAIL_VERIFY_EXPIRE_HOURS
+    )
+    payload = {"sub": str(user_id), "type": "verify_email", "exp": expire}
+    return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)

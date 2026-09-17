@@ -2,6 +2,7 @@
 
 from enum import Enum
 
+import sqlalchemy as sa
 from sqlalchemy import JSON, Boolean, Column
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy import String, Text
@@ -70,6 +71,9 @@ class User(BaseModel):
     # Flags
     email_verified = Column(Boolean, default=False)
     two_factor_enabled = Column(Boolean, default=False)
+    mentor_available = Column(
+        Boolean, nullable=False, default=False, server_default=sa.false()
+    )
 
     # Relationships
     created_jobs = relationship(

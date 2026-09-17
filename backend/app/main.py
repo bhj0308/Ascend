@@ -11,6 +11,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
+from slowapi.errors import RateLimitExceeded
 
 from app.config import Settings, get_settings
 from app.routes import (
@@ -23,6 +24,7 @@ from app.routes import (
     payments,
     profile,
 )
+from app.services.ratelimit import limiter
 
 # Configure logging
 logging.basicConfig(
@@ -84,6 +86,17 @@ def create_app(settings: Settings = None) -> FastAPI:
         TrustedHostMiddleware,
         allowed_hosts=settings.allowed_hosts_list,
     )
+
+    # Rate limiting on /auth/* (see app/services/ratelimit.py)
+    app.state.limiter = limiter
+
+    @app.exception_handler(RateLimitExceeded)
+    async def rate_limit_handler(request, exc):
+        """Handle a tripped rate limit."""
+        return JSONResponse(
+            status_code=429,
+            content={"detail": "Too many requests. Try again in a minute."},
+        )
 
     # Health check endpoint
     @app.get("/health", tags=["Health"])

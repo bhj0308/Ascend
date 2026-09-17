@@ -18,11 +18,13 @@ export interface User {
   skills?: string[]
   languages?: string[]
   visa_status?: string
+  email_verified: boolean
+  mentor_available?: boolean
   created_at: string
 }
 
 // What `GET /profile/:id` returns about someone else — never their email.
-export type PublicUser = Omit<User, 'email'>
+export type PublicUser = Omit<User, 'email' | 'email_verified'>
 
 export type JobType = 'full_time' | 'part_time' | 'contract' | 'internship'
 export type JobStatus = 'draft' | 'open' | 'closed' | 'filled'

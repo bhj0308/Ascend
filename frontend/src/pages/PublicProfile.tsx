@@ -56,7 +56,7 @@ export function PublicProfile() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-10">
       <h1 className="text-2xl font-bold text-gray-900">
-        {profile.first_name} {profile.last_name}
+        {[profile.first_name, profile.last_name].filter(Boolean).join(' ') || `User #${profile.id}`}
       </h1>
       <p className="mt-1 inline-block rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
         {profile.user_type.replace('_', ' ')}
@@ -97,6 +97,8 @@ export function PublicProfile() {
 
       {isSelf ? (
         <p className="mt-6 text-sm text-gray-500">This is you.</p>
+      ) : profile.status !== 'active' ? (
+        <p className="mt-6 text-sm text-gray-500">This account has been deleted.</p>
       ) : (
         <div className="mt-6 flex flex-wrap gap-3">
           {requestMutation.isSuccess ? (

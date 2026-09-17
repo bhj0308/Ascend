@@ -47,6 +47,7 @@ class UserUpdate(BaseModel):
     timezone: Optional[str] = None
     visa_status: Optional[str] = None
     visa_expiry: Optional[str] = None
+    mentor_available: Optional[bool] = None
 
 
 class UserResponse(UserBase):
@@ -61,6 +62,8 @@ class UserResponse(UserBase):
     languages: Optional[List[str]] = None
     visa_status: Optional[str] = None
     status: UserStatus
+    email_verified: bool = False
+    mentor_available: bool = False
     created_at: datetime
 
 
@@ -81,6 +84,7 @@ class PublicUserResponse(BaseModel):
     languages: Optional[List[str]] = None
     visa_status: Optional[str] = None
     status: UserStatus
+    mentor_available: bool = False
     created_at: datetime
 
 
@@ -88,6 +92,12 @@ class UserLogin(BaseModel):
     """Login credentials."""
 
     email: EmailStr
+    password: str
+
+
+class DeleteAccountRequest(BaseModel):
+    """Body for DELETE /profile/me."""
+
     password: str
 
 

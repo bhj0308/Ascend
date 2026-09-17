@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models.user import User
+from app.models.user import User, UserStatus
 from app.services.auth import decode_token
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
@@ -35,6 +35,8 @@ def get_current_user(
     except ValueError:
         raise credentials_exception
     if user is None:
+        raise credentials_exception
+    if user.status != UserStatus.ACTIVE:
         raise credentials_exception
 
     return user

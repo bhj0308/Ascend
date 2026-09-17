@@ -14,6 +14,16 @@ Authenticated endpoints expect `Authorization: Bearer <access_token>`.
 | POST | `/auth/signup` | none | Register with email/password. Returns the created user. |
 | POST | `/auth/login` | none | Exchange email/password for access + refresh JWTs. |
 | GET | `/auth/me` | required | Get the current authenticated user. |
+| POST | `/auth/refresh` | none | `{refresh_token}` → new access + refresh pair. 401 if invalid/expired/not a refresh token. |
+| POST | `/auth/forgot-password` | none | `{email}` → always 200 with the same generic message (no enumeration). Sends a reset link if the account exists. |
+| POST | `/auth/reset-password` | none | `{token, new_password}` → 200. 400 if the link is invalid, expired, or already used (tokens are bound to the current password hash). 422 if `new_password` < 8 chars. |
+| POST | `/auth/send-verification` | required | Sends (or resends) the email-verification link. 200 "Already verified" if it is. |
+| POST | `/auth/verify-email` | none | `{token}` → 200, sets `email_verified`. 400 if invalid/expired. Idempotent. |
+
+All `/auth/*` routes except `GET /auth/me` are rate-limited per client IP (`X-Forwarded-For` aware): login 10/min,
+signup 5/min, forgot-password 3/min, reset-password 5/min, refresh 30/min, verify-email
+10/min, send-verification 3/min. Exceeding a limit returns **429** `{"detail": "..."}`.
+Emails are printed to the API log until `SENDGRID_API_KEY` is configured.
 
 **POST `/auth/signup`**
 ```json
@@ -42,8 +52,9 @@ Response:
 | Method | Path | Auth | Description |
 |---|---|---|---|
 | GET | `/profile/me` | required | Full profile of the current user. |
-| PUT | `/profile/me` | required | Update editable profile fields. |
-| GET | `/profile/{user_id}` | none | View another user's public profile. |
+| PUT | `/profile/me` | required | Update editable profile fields (incl. `mentor_available`, `skills`, `languages`, `visa_status`). |
+| DELETE | `/profile/me` | required | `{password}` → 204. **Anonymizes** rather than deletes: personal fields cleared, email replaced, status `inactive`, password removed, open jobs closed; contracts/payments/messages kept for counterparties under "User #id". 401 wrong password; 400 if the account has no password. Existing tokens stop working. |
+| GET | `/profile/{user_id}` | none | View another user's public profile — never includes `email` or `phone`. |
 
 ## Jobs
 
@@ -101,7 +112,8 @@ Amounts are integer cents.
 
 | Method | Path | Auth | Description |
 |---|---|---|---|
-| POST | `/mentorships` | required | Request mentorship from `mentor_id`; requester becomes the mentee. 404 unknown mentor; 400 if requesting yourself or a `requested`/`active` mentorship already exists between the two users (either direction). Creates `requested`. |
+| POST | `/mentorships` | required | Request mentorship from `mentor_id`; requester becomes the mentee. 404 unknown mentor; 400 if requesting yourself, if the mentor's account is no longer active, or if a `requested`/`active` mentorship already exists between the two users (either direction). Creates `requested`. |
+| GET | `/mentorships/mentors` | required | Directory of users with `mentor_available: true` (active only, excludes the caller), newest first, max 50. Query: `skill` (case-insensitive substring of any skill), `country` (exact). Public-profile shape, no email. |
 | GET | `/mentorships/me` | required | Mentorships where the current user is mentor or mentee, newest first. |
 | GET | `/mentorships/{mentorship_id}` | required (mentor or mentee only) | Get a single mentorship. |
 | POST | `/mentorships/{mentorship_id}/accept` | required (mentor only) | `requested` -> `active`. 400 if not requested. |
@@ -114,7 +126,7 @@ Plain HTTP; clients poll. No websockets in this version.
 
 | Method | Path | Auth | Description |
 |---|---|---|---|
-| POST | `/messages` | required | Send a message; sender = current user. 404 if `recipient_id` or optional `job_id` doesn't exist; 400 if sending to yourself or the body is empty/whitespace. |
+| POST | `/messages` | required | Send a message; sender = current user. 404 if `recipient_id` or optional `job_id` doesn't exist; 400 if sending to yourself, if the recipient's account is no longer active, or the body is empty/whitespace. |
 | GET | `/messages/threads` | required | One summary per user you've exchanged messages with: `user_id`, `user_name`, `last_message_body`, `last_message_at`, `unread_count`; newest first. |
 | GET | `/messages/with/{user_id}` | required | Full history with that user, oldest first. 404 if the user doesn't exist. Side effect: marks their unread messages to you as read. Any user may open an (empty) thread with any existing user. |
 

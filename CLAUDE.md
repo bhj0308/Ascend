@@ -19,14 +19,17 @@ Keep this file short — it loads every session. Long workflows live in
 - **Done, tested:** auth, profiles, jobs CRUD + filters, applications pipeline, **contracts**
   (templates → draft → send → sign/cancel, typed terms), **payments** (ledger only — `execute`
   is 501 until Wise is wired), **mentorships** (request → accept/decline → complete),
-  **messages** (threads + per-user history, mark-read on open, polling), token refresh. 35 API paths.
+  **messages** (threads + per-user history, mark-read on open, polling), token refresh,
+  password reset + email verification, rate limiting on `/auth/*`, account deletion
+  (anonymizing), mentor directory. 40 API paths.
   Every model has routes. `backend/tests/` is a real-Postgres pytest harness (`ascend_test`
-  DB on the `.env` host) — 66 tests. Add to it; don't verify by hand. New resource pattern:
+  DB on the `.env` host) — 89 tests. Add to it; don't verify by hand. New resource pattern:
   `routes/contracts.py` + `tests/routes/test_contracts.py`.
-- Frontend (21 routes): Home, Jobs, JobDetail, JobNew, JobApplicants (names → `/users/:id`),
+- Frontend (25 routes): Landing `/` (KO/EN toggle, copy in `src/content/landing.ts`), Jobs, JobDetail, JobNew, JobApplicants (names → `/users/:id`),
   Contracts/ContractNew/ContractDetail (+ "Record payment" for founder), Payments/PaymentNew/
-  PaymentDetail (ledger-only banner), Mentorships, PublicProfile `/users/:id` (request mentorship
-  + message), Messages/MessageThread (polling 15s/5s), Login, Signup, Profile, Guides (placeholder),
+  PaymentDetail (ledger-only banner), Mentorships, Mentors `/mentors` (directory), PublicProfile `/users/:id` (request mentorship
+  + message), Messages/MessageThread (polling 15s/5s), Login (+ forgot/reset password), Signup, VerifyEmail, Profile (editor, mentor toggle,
+  delete account), Guides (placeholder),
   Terms/Privacy (drafts, marked). `App.tsx` `AuthBootstrap` restores the session on reload.
   Per-resource types live in `src/types/<resource>.ts`; shared `User`/`Job`/`Application` in `types/index.ts`.
 
@@ -58,6 +61,13 @@ DB URL comes from `backend/.env` (gitignored; copy from `.env.example`). Full se
   never use `datetime.utcnow()`. Date-only strings (contract `*_date` terms) must be formatted
   with `frontend/src/utils/dates.ts::formatDateOnly`, not `new Date(str)` (off-by-one west of UTC).
 - `display_name()` falls back to `User #<id>`, never the email/local-part.
+- Emails: `services/email.py` — console sender logs a `===== EMAIL to … =====` block (the
+  reset/verify link is one greppable line) until `SENDGRID_API_KEY` is set. Reset tokens embed a
+  fingerprint of the current password hash, so they die when the password changes.
+- Rate limits (`services/ratelimit.py`, slowapi, keyed on first `X-Forwarded-For`): tests set
+  `RATE_LIMIT_ENABLED=false` in `conftest.py`; decorated routes need a `request: Request` param.
+- Account deletion anonymizes (status `inactive`, email → `deleted-<id>@deleted.invalid`);
+  `get_current_user` rejects non-active users. Never hard-delete users.
 - `GET /profile/{id}` returns `PublicUserResponse` — never email. Only `/profile/me` and
   `/auth/me` include it. Don't display emails as name fallbacks.
 

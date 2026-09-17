@@ -239,7 +239,8 @@ Full schema: See `docs/DATABASE.md`
 - [x] Payment records (ledger) — real transfers behind `ENABLE_WISE_PAYMENTS`, needs credentials
 - [x] Mentorship requests (request → accept/decline → complete)
 - [x] In-app messaging (threads, polling)
-- [ ] Mentor directory — needs a `User` flag + migration
+- [x] Mentor directory (opt-in `mentor_available`, `/mentors`)
+- [x] Profile editor + account deletion (anonymizing)
 - [ ] Community Slack/Discord
 
 ### Launch readiness (no external input needed)
@@ -247,7 +248,8 @@ Full schema: See `docs/DATABASE.md`
 - [x] Production config guards (`SECRET_KEY`, env-driven CORS/hosts)
 - [x] Render blueprint, CI, deploy guide — see `docs/DEPLOY.md`
 - [x] Draft Terms / Privacy pages (marked as unreviewed)
-- [ ] Password reset / email verification — needs an email provider
+- [x] Password reset + email verification (emails print to the API log until `SENDGRID_API_KEY` is set)
+- [x] Rate limiting on `/auth/*`
 
 ### Phase 4: Launch & Scale (Weeks 19-20+)
 - [ ] Analytics & monitoring

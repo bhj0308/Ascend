@@ -1,7 +1,14 @@
 import axios, { type InternalAxiosRequestConfig } from 'axios'
 import { useAuthStore } from '@/store/authStore'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
+// Normalize VITE_API_URL so "https://host", "https://host/", and "https://host/api/"
+// all resolve to "https://host/api" — a missing /api was a real deploy-day mistake.
+function normalizeApiUrl(raw: string): string {
+  const trimmed = raw.replace(/\/+$/, '')
+  return trimmed.endsWith('/api') ? trimmed : `${trimmed}/api`
+}
+
+const API_URL = normalizeApiUrl(import.meta.env.VITE_API_URL || 'http://localhost:8000/api')
 
 export const api = axios.create({
   baseURL: API_URL,

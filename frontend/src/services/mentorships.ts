@@ -1,8 +1,14 @@
 import { api } from './api'
 import type { Mentorship } from '@/types/mentorship'
+import type { PublicUser } from '@/types'
 
 export async function getMyMentorships(): Promise<Mentorship[]> {
   const { data } = await api.get<Mentorship[]>('/mentorships/me')
+  return data
+}
+
+export async function getMentors(params: { skill?: string; country?: string }): Promise<PublicUser[]> {
+  const { data } = await api.get<PublicUser[]>('/mentorships/mentors', { params })
   return data
 }
 

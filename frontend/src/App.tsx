@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Navbar } from '@/components/Navbar'
-import { Home } from '@/pages/Home'
+import { Landing } from '@/pages/Landing'
 import { Jobs } from '@/pages/Jobs'
 import { JobDetail } from '@/pages/JobDetail'
 import { JobNew } from '@/pages/JobNew'
@@ -22,6 +22,11 @@ import { MessageThread } from '@/pages/MessageThread'
 import { Terms } from '@/pages/Terms'
 import { Privacy } from '@/pages/Privacy'
 import { Footer } from '@/components/Footer'
+import { VerifyEmailBanner } from '@/components/VerifyEmailBanner'
+import { ForgotPassword } from '@/pages/ForgotPassword'
+import { ResetPassword } from '@/pages/ResetPassword'
+import { VerifyEmail } from '@/pages/VerifyEmail'
+import { Mentors } from '@/pages/Mentors'
 import { useEffect } from 'react'
 import { getMe } from '@/services/auth'
 import { useAuthStore } from '@/store/authStore'
@@ -47,8 +52,9 @@ export function App() {
     <BrowserRouter>
       <AuthBootstrap />
       <Navbar />
+      <VerifyEmailBanner />
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Landing />} />
         <Route path="/jobs" element={<Jobs />} />
         <Route path="/jobs/new" element={<JobNew />} />
         <Route path="/jobs/:id" element={<JobDetail />} />
@@ -56,11 +62,15 @@ export function App() {
         <Route path="/guides" element={<Guides />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/contracts" element={<Contracts />} />
         <Route path="/contracts/new" element={<ContractNew />} />
         <Route path="/contracts/:id" element={<ContractDetail />} />
         <Route path="/mentorships" element={<Mentorships />} />
+        <Route path="/mentors" element={<Mentors />} />
         <Route path="/users/:id" element={<PublicProfile />} />
         <Route path="/payments" element={<Payments />} />
         <Route path="/payments/new" element={<PaymentNew />} />
