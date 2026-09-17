@@ -11,6 +11,15 @@ export interface LandingCopy {
   sub: string
   ctaPost: string
   ctaBrowse: string
+  heroNotes: string[]
+  preview: {
+    route: { from: string; to: string; caption: string }
+    job: { title: string; meta: string; badge: string }
+    contract: { label: string; status: string }
+    message: { from: string; body: string }
+  }
+  live: { title: string; count: (n: number) => string; viewAll: string }
+  flags: { remote: string; visa: string; iec: string }
   founders: { title: string; bullets: string[]; cta: string }
   talent: { title: string; bullets: string[]; cta: string }
   how: { title: string; steps: { title: string; body: string }[] }
@@ -27,6 +36,20 @@ export const LANDING: Record<Lang, LandingCopy> = {
     sub: 'Ascend connects founders with engineers on both sides of the Pacific, and gives IEC working-holiday talent and newcomers a real way into Canadian tech. Jobs, contracts, mentorship, messaging, and payment records — in one place.',
     ctaPost: 'Post a job — free',
     ctaBrowse: 'Browse jobs',
+    heroNotes: ['Free during early access', 'English & 한국어', 'Your email stays private'],
+    // Illustrations of real features in the hero; not live data.
+    preview: {
+      route: { from: 'Seoul', to: 'Toronto', caption: 'Hire across the Pacific' },
+      job: { title: 'Backend Engineer', meta: 'Toronto · Full-time', badge: 'IEC-friendly' },
+      contract: { label: 'Contract', status: 'Signed' },
+      message: { from: 'New message', body: 'Are you free for a call Thursday?' },
+    },
+    live: {
+      title: 'Open right now',
+      count: (n) => `${n} open ${n === 1 ? 'role' : 'roles'}`,
+      viewAll: 'View all jobs',
+    },
+    flags: { remote: 'Remote OK', visa: 'Visa sponsorship', iec: 'IEC-friendly' },
     founders: {
       title: "I'm hiring",
       bullets: [
@@ -94,6 +117,20 @@ export const LANDING: Record<Lang, LandingCopy> = {
     sub: 'Ascend는 태평양 양쪽의 창업자와 엔지니어를 연결하고, 워킹홀리데이(IEC)와 이민자 인재에게 캐나다 테크 업계로 가는 실질적인 길을 열어줍니다. 채용 공고, 계약서, 멘토링, 메시지, 결제 기록까지 한곳에서.',
     ctaPost: '무료로 채용 공고 올리기',
     ctaBrowse: '채용 공고 보기',
+    heroNotes: ['얼리 액세스 기간 무료', '한국어 & English', '이메일은 비공개'],
+    // 히어로 영역의 기능 예시 이미지이며 실제 데이터가 아닙니다.
+    preview: {
+      route: { from: '서울', to: '토론토', caption: '태평양을 넘는 채용' },
+      job: { title: '백엔드 엔지니어', meta: '토론토 · 정규직', badge: 'IEC 가능' },
+      contract: { label: '계약서', status: '서명 완료' },
+      message: { from: '새 메시지', body: '목요일에 통화 가능하실까요?' },
+    },
+    live: {
+      title: '지금 모집 중',
+      count: (n) => `${n}개 포지션 모집 중`,
+      viewAll: '전체 공고 보기',
+    },
+    flags: { remote: '원격 가능', visa: '비자 지원', iec: 'IEC 가능' },
     founders: {
       title: '채용 중이에요',
       bullets: [

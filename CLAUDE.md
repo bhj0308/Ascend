@@ -23,9 +23,10 @@ Keep this file short — it loads every session. Long workflows live in
   password reset + email verification, rate limiting on `/auth/*`, account deletion
   (anonymizing), mentor directory. 40 API paths.
   Every model has routes. `backend/tests/` is a real-Postgres pytest harness (`ascend_test`
-  DB on the `.env` host) — 91 tests. Add to it; don't verify by hand. New resource pattern:
+  via `TEST_DATABASE_URL`, default `localhost:5433`) — 91 tests. Add to it; don't verify by hand. New resource pattern:
   `routes/contracts.py` + `tests/routes/test_contracts.py`.
-- Frontend (25 routes): Landing `/` (KO/EN toggle, copy in `src/content/landing.ts`), Jobs, JobDetail, JobNew, JobApplicants (names → `/users/:id`),
+- Frontend (25 routes): Landing `/` (KO/EN toggle, copy in `src/content/landing.ts`; animated hero,
+  live open-roles marquee from `GET /jobs`, scroll reveals via `src/hooks/useReveal.ts`), Jobs, JobDetail, JobNew, JobApplicants (names → `/users/:id`),
   Contracts/ContractNew/ContractDetail (+ "Record payment" for founder), Payments/PaymentNew/
   PaymentDetail (ledger-only banner), Mentorships, Mentors `/mentors` (directory), PublicProfile `/users/:id` (request mentorship
   + message), Messages/MessageThread (polling 15s/5s), Login (+ forgot/reset password), Signup, VerifyEmail, Profile (editor, mentor toggle,
@@ -70,6 +71,9 @@ DB URL comes from `backend/.env` (gitignored; copy from `.env.example`). Full se
   `RATE_LIMIT_ENABLED=false` in `conftest.py`; decorated routes need a `request: Request` param.
 - Account deletion anonymizes (status `inactive`, email → `deleted-<id>@deleted.invalid`);
   `get_current_user` rejects non-active users. Never hard-delete users.
+- Landing motion is Tailwind keyframes (`tailwind.config.js`) + `.reveal` in `styles/index.css`, all
+  disabled under `prefers-reduced-motion`. Use `overflow-clip`, not `overflow-hidden`, on containers
+  with bleeding decorations — `hidden` still scrolls programmatically (focus shifted the hero 96px).
 - `GET /profile/{id}` returns `PublicUserResponse` — never email. Only `/profile/me` and
   `/auth/me` include it. Don't display emails as name fallbacks.
 

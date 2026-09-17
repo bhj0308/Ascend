@@ -1,9 +1,17 @@
 # API Reference
 
 Base URL (local dev): `http://localhost:8000/api`
+Base URL (production): `https://ascend-api-onu3.onrender.com/api`
 
 Interactive docs (Swagger UI): `http://localhost:8000/docs`
 Interactive docs (ReDoc): `http://localhost:8000/redoc`
+Both are disabled when `ENVIRONMENT=production`.
+
+`GET /health` (no `/api` prefix, no auth) → `{"status": "healthy", "environment": "...", "version": "0.1.0"}`.
+Render uses it as the health check.
+
+Conventions: money is integer cents; timestamps are ISO 8601 with a UTC offset; errors are
+`{"detail": "..."}` (422 validation errors use FastAPI's list format).
 
 Authenticated endpoints expect `Authorization: Bearer <access_token>`.
 
@@ -134,5 +142,6 @@ Plain HTTP; clients poll. No websockets in this version.
 
 - `POST /payments/{payment_id}/execute` doing a real Wise transfer (`ENABLE_WISE_PAYMENTS`)
 - `POST /contracts/{contract_id}/send` creating a DocuSign envelope (`ENABLE_DOCUSIGN`)
-- A mentor directory (`GET /mentorships/mentors`) — needs a "mentor available" flag on `User` and a migration
-- `GET /knowledge/guides` — knowledge base content
+- Google OAuth sign-in (`ENABLE_GOOGLE_OAUTH`; `users.google_id` exists, no routes)
+- `GET /knowledge/guides` — knowledge base content (the frontend `/guides` page is static)
+- Admin / moderation endpoints
