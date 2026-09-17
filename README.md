@@ -72,7 +72,7 @@ We bridge the gap between opportunity and talent, making cross-border hiring sim
 ## Project Structure
 
 ```
-TalentFlow/
+Ascend/
 ├── backend/              # FastAPI application
 │   ├── app/
 │   │   ├── __init__.py

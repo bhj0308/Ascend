@@ -1,14 +1,10 @@
 import { Link } from 'react-router-dom'
 import type { Job } from '@/types'
+import { formatCents } from '@/utils/money'
 
 function formatSalary(job: Job): string | null {
   if (!job.salary_min && !job.salary_max) return null
-  const fmt = (cents: number) =>
-    new Intl.NumberFormat('en-CA', {
-      style: 'currency',
-      currency: job.salary_currency,
-      maximumFractionDigits: 0,
-    }).format(cents / 100)
+  const fmt = (cents: number) => formatCents(cents, job.salary_currency)
 
   if (job.salary_min && job.salary_max) return `${fmt(job.salary_min)} – ${fmt(job.salary_max)}`
   return fmt(job.salary_min || job.salary_max || 0)

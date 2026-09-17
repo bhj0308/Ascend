@@ -12,7 +12,16 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
 
 from app.config import Settings, get_settings
-from app.routes import applications, auth, jobs, profile
+from app.routes import (
+    applications,
+    auth,
+    contracts,
+    jobs,
+    mentorships,
+    messages,
+    payments,
+    profile,
+)
 
 # Configure logging
 logging.basicConfig(
@@ -89,15 +98,6 @@ def create_app(settings: Settings = None) -> FastAPI:
             "api_prefix": "/api",
         }
 
-    # 404 Handler
-    @app.exception_handler(404)
-    async def not_found_handler(request, exc):
-        """Handle 404 Not Found errors."""
-        return JSONResponse(
-            status_code=404,
-            content={"detail": "Endpoint not found", "path": request.url.path},
-        )
-
     # 500 Handler
     @app.exception_handler(Exception)
     async def general_exception_handler(request, exc):
@@ -115,6 +115,12 @@ def create_app(settings: Settings = None) -> FastAPI:
     app.include_router(
         applications.router, prefix="/api/applications", tags=["Applications"]
     )
+    app.include_router(payments.router, prefix="/api/payments", tags=["Payments"])
+    app.include_router(
+        mentorships.router, prefix="/api/mentorships", tags=["Mentorships"]
+    )
+    app.include_router(messages.router, prefix="/api/messages", tags=["Messages"])
+    app.include_router(contracts.router, prefix="/api/contracts", tags=["Contracts"])
 
     logger.info(f"✅ FastAPI app configured for {settings.ENVIRONMENT} environment")
     return app

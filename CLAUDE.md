@@ -1,9 +1,9 @@
-# Ascend (repo folder: TalentFlow)
+# Ascend
 
 Two-sided tech-talent marketplace: Korean-Canadian founders hiring engineers
 (Korea first, global later) + IEC working-holiday / immigrant talent finding
 jobs in Canada, with contracts, compliance guides, and cross-border payments.
-Product name is **Ascend**; the folder is still `TalentFlow`.
+Repo folder and product name are both **Ascend**.
 
 Keep this file short — it loads every session. Long workflows live in
 `.claude/skills/`; design docs live in `docs/`.
@@ -16,18 +16,26 @@ Keep this file short — it loads every session. Long workflows live in
 - `docs/` ARCHITECTURE, DATABASE, API, SETUP, PRODUCT.html (roadmap). Read only when needed.
 
 ## Status (Sept 2026)
-- **Done, smoke-tested:** auth (signup/login/JWT), profiles, jobs CRUD + filters,
-  applications + status pipeline, permission boundaries (401/403). 13 API routes.
-- **Models exist but no routes yet:** Contract, Payment, Mentorship, Message.
-  Phase 2/3 work = write `routes/<x>.py` + register in `main.py` (pattern: `routes/jobs.py`).
-- Frontend: Home, Jobs, JobDetail, JobNew, Login, Signup, Profile, Guides (placeholder).
+- **Done, tested:** auth, profiles, jobs CRUD + filters, applications pipeline, **contracts**
+  (templates → draft → send → sign/cancel, typed terms), **payments** (ledger only — `execute`
+  is 501 until Wise is wired), **mentorships** (request → accept/decline → complete),
+  **messages** (threads + per-user history, mark-read on open, polling). 34 API paths.
+  Every model has routes. `backend/tests/` is a real-Postgres pytest harness (`ascend_test`
+  DB on the `.env` host) — 56 tests. Add to it; don't verify by hand. New resource pattern:
+  `routes/contracts.py` + `tests/routes/test_contracts.py`.
+- Frontend (19 routes): Home, Jobs, JobDetail, JobNew, JobApplicants (names → `/users/:id`),
+  Contracts/ContractNew/ContractDetail (+ "Record payment" for founder), Payments/PaymentNew/
+  PaymentDetail (ledger-only banner), Mentorships, PublicProfile `/users/:id` (request mentorship
+  + message), Messages/MessageThread (polling 15s/5s), Login, Signup, Profile, Guides (placeholder).
+  Per-resource types live in `src/types/<resource>.ts`; shared `User`/`Job`/`Application` in `types/index.ts`.
 
 ## Run / verify
 ```bash
 cd backend && source venv/bin/activate && uvicorn app.main:app --reload   # :8000, /docs
 cd frontend && npm run dev                                                # :5173
 cd frontend && npm run build                                              # tsc + vite, must pass
-cd backend && black app/ migrations/env.py && isort app/ migrations/env.py  # must be clean
+cd backend && black app/ tests/ && isort app/ tests/                       # must be clean
+cd backend && pytest -q                                                   # needs ascend_test DB
 ```
 DB URL comes from `backend/.env` (gitignored; copy from `.env.example`). Full setup: `docs/SETUP.md`.
 

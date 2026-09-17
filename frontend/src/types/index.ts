@@ -63,3 +63,32 @@ export interface Application {
   cover_note?: string
   created_at: string
 }
+
+export type ContractTemplateType =
+  | 'korea_engineer_canada_co'
+  | 'canada_engineer_korea_co'
+  | 'remote_contractor'
+  | 'full_time_domestic'
+  | 'part_time_gig'
+export type ContractStatus = 'draft' | 'pending_signature' | 'signed' | 'cancelled'
+
+export interface TemplateInfo {
+  type: ContractTemplateType
+  label: string
+  description: string
+  required_terms: string[]
+}
+
+export interface Contract {
+  id: number
+  application_id: number
+  template_type: ContractTemplateType
+  status: ContractStatus
+  terms: Record<string, unknown>
+  signed_at: string | null
+  created_at: string
+  job_id: number
+  job_title: string
+  founder_id: number
+  applicant_id: number
+}

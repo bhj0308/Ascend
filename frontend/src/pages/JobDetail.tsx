@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { getJob, applyToJob } from '@/services/jobs'
 import { useAuthStore } from '@/store/authStore'
@@ -7,7 +7,7 @@ import { useAuthStore } from '@/store/authStore'
 export function JobDetail() {
   const { id } = useParams<{ id: string }>()
   const jobId = Number(id)
-  const { isAuthenticated } = useAuthStore()
+  const { user, isAuthenticated } = useAuthStore()
   const [coverNote, setCoverNote] = useState('')
   const [applied, setApplied] = useState(false)
 
@@ -33,7 +33,14 @@ export function JobDetail() {
       <p className="mt-6 whitespace-pre-wrap text-gray-700">{job.description}</p>
 
       <div className="mt-8 rounded-lg border border-gray-200 bg-white p-6">
-        {!isAuthenticated ? (
+        {user?.id === job.creator_id ? (
+          <Link
+            to={`/jobs/${job.id}/applicants`}
+            className="font-medium text-primary-600 hover:text-primary-700"
+          >
+            View applicants →
+          </Link>
+        ) : !isAuthenticated ? (
           <p className="text-gray-600">Log in to apply for this job.</p>
         ) : applied ? (
           <p className="font-medium text-green-700">Application submitted! 🎉</p>

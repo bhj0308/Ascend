@@ -32,6 +32,18 @@ export function Navbar() {
                   Post a Job
                 </Link>
               )}
+              <Link to="/contracts" className="hover:text-primary-600">
+                Contracts
+              </Link>
+              <Link to="/mentorships" className="hover:text-primary-600">
+                Mentorships
+              </Link>
+              <Link to="/payments" className="hover:text-primary-600">
+                Payments
+              </Link>
+              <Link to="/messages" className="hover:text-primary-600">
+                Messages
+              </Link>
               <Link to="/profile" className="hover:text-primary-600">
                 {user?.first_name || 'Profile'}
               </Link>
