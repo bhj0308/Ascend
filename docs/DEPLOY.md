@@ -19,8 +19,22 @@ nothing needs to be run by hand except the checks at the end.
    `/docs` is intentionally disabled in production.
 5. Open `https://ascend-web.onrender.com`, sign up, post a job. Done.
 
-If you rename either service, update **both** `CORS_ORIGINS` (on the API) and
-`VITE_API_URL` (on the static site) — a mismatch shows up as CORS errors in the browser
+### Render adds a suffix to service names — fix the URLs once
+
+Render usually assigns hostnames like `ascend-api-onu3.onrender.com`, not the bare names
+in `render.yaml`. After the first deploy, copy the real URLs from each service's page:
+
+1. `ascend-api` → **Environment** → `CORS_ORIGINS` = the static site's real URL
+   (e.g. `https://ascend-web-ab12.onrender.com`). Saves and restarts automatically.
+2. `ascend-web` → **Environment** → `VITE_API_URL` = the API's real URL + `/api`
+   (e.g. `https://ascend-api-onu3.onrender.com/api`), then **Manual Deploy → Deploy latest
+   commit** — this value is baked in at build time, so a rebuild is required.
+
+`ALLOWED_HOSTS` is `*.onrender.com` so the API accepts any suffixed name. If it is ever
+set to an exact hostname that doesn't match, every request — including `/health` — gets a
+**400 "Invalid host header"** and the deploy fails its health check.
+
+A mismatch in `CORS_ORIGINS`/`VITE_API_URL` shows up as CORS errors in the browser
 console and blank pages.
 
 ## 2. Environment variables
