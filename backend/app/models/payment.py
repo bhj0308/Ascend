@@ -2,7 +2,7 @@
 
 from enum import Enum
 
-from sqlalchemy import Column
+from sqlalchemy import BigInteger, Column
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
@@ -39,7 +39,7 @@ class Payment(BaseModel):
     )  # Nullable: recipient may be external
 
     # Amount (stored as integer cents to avoid float rounding issues)
-    amount = Column(Integer, nullable=False)
+    amount = Column(BigInteger, nullable=False)
     currency = Column(String(3), nullable=False)  # ISO currency code, e.g. CAD, KRW
 
     payment_type = Column(SQLEnum(PaymentType), nullable=False)

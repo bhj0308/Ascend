@@ -2,7 +2,7 @@
 
 from enum import Enum
 
-from sqlalchemy import JSON, Boolean, Column
+from sqlalchemy import JSON, BigInteger, Boolean, Column
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy import ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
@@ -42,8 +42,8 @@ class Job(BaseModel):
     company_name = Column(String(255), nullable=True)
 
     # Compensation
-    salary_min = Column(Integer, nullable=True)  # In smallest currency unit (cents)
-    salary_max = Column(Integer, nullable=True)
+    salary_min = Column(BigInteger, nullable=True)  # In smallest currency unit (cents)
+    salary_max = Column(BigInteger, nullable=True)
     salary_currency = Column(String(3), default="CAD")  # ISO currency code
 
     # Requirements

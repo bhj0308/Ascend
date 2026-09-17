@@ -23,7 +23,7 @@ Keep this file short — it loads every session. Long workflows live in
   password reset + email verification, rate limiting on `/auth/*`, account deletion
   (anonymizing), mentor directory. 40 API paths.
   Every model has routes. `backend/tests/` is a real-Postgres pytest harness (`ascend_test`
-  DB on the `.env` host) — 89 tests. Add to it; don't verify by hand. New resource pattern:
+  DB on the `.env` host) — 91 tests. Add to it; don't verify by hand. New resource pattern:
   `routes/contracts.py` + `tests/routes/test_contracts.py`.
 - Frontend (25 routes): Landing `/` (KO/EN toggle, copy in `src/content/landing.ts`), Jobs, JobDetail, JobNew, JobApplicants (names → `/users/:id`),
   Contracts/ContractNew/ContractDetail (+ "Record payment" for founder), Payments/PaymentNew/
@@ -40,6 +40,7 @@ cd frontend && npm run dev                                                # :517
 cd frontend && npm run build                                              # tsc + vite, must pass
 cd backend && black app/ tests/ && isort app/ tests/                       # must be clean
 cd backend && pytest -q                                                   # needs ascend_test DB
+cd backend && python scripts/seed.py [--reset]                            # demo data via the real API
 ```
 Deploy: `render.yaml` + `docs/DEPLOY.md` (Render blueprint, migrations at start, CI in `.github/`).
 DB URL comes from `backend/.env` (gitignored; copy from `.env.example`). Full setup: `docs/SETUP.md`.
@@ -50,7 +51,8 @@ DB URL comes from `backend/.env` (gitignored; copy from `.env.example`). Full se
   every new enum, or `downgrade → upgrade` fails with DuplicateObject.
 - SQLAlchemy `Enum` columns persist the Python member **name** (`'FOUNDER'`), not the
   value (`'founder'`). API JSON shows values. Never filter on values in raw SQL.
-- Money is integer **cents** (`salary_min`, `amount`) + ISO currency code. No floats.
+- Money is integer **cents** (`salary_min`, `amount`) + ISO currency code. No floats. Columns
+  are `BigInteger`: KRW in cents overflows int32 at ₩21.5M (a seed run found this).
 - Passwords: `bcrypt` directly (no passlib). Public `UserResponse` must never include `password_hash`.
 - Python is 3.13 here; pin deps to versions with 3.13 wheels.
 - `ENVIRONMENT=production` refuses to start with the default/short `SECRET_KEY`. `CORS_ORIGINS`

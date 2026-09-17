@@ -15,9 +15,10 @@ nothing needs to be run by hand except the checks at the end.
    Render reads `render.yaml` and creates `ascend-db`, `ascend-api`, and `ascend-web`.
 2. `SECRET_KEY` is generated automatically. `DATABASE_URL` is injected from the database.
 3. First deploy of `ascend-api` runs `alembic upgrade head` on startup, creating all tables.
-4. Open `https://ascend-api.onrender.com/health` → `{"status":"healthy","environment":"production"}`.
+4. Open `https://<your-api-host>.onrender.com/health` (ours: `ascend-api-onu3`) →
+   `{"status":"healthy","environment":"production"}`.
    `/docs` is intentionally disabled in production.
-5. Open `https://ascend-web.onrender.com`, sign up, post a job. Done.
+5. Open the static site (ours: `https://ascend-web-irk7.onrender.com`), sign up, post a job. Done.
 
 ### Render adds a suffix to service names — fix the URLs once
 
@@ -56,6 +57,22 @@ console and blank pages.
 Placeholders that are wired but inert until you add credentials:
 `SENDGRID_API_KEY` (no email is sent yet), `WISE_API_KEY` + `ENABLE_WISE_PAYMENTS`
 (payments stay ledger-only), `DOCUSIGN_*` + `ENABLE_DOCUSIGN` (send is a manual status change).
+
+## 2b. Demo data on the live site (optional)
+
+To make the MVP interactable for visitors, seed the demo dataset from Render → `ascend-api`
+→ **Shell**:
+
+```bash
+python scripts/seed.py --allow-production
+```
+
+It creates ten `@example.com` accounts (founders, engineers, IEC holders, an immigrant) with
+jobs, applications, contracts, mentorships, messages and payment records, and prints the
+logins. **They all share the password `demo-pass-2026`**, so anyone who reads this repo can
+sign in as them — fine for a demo, not once real users depend on the site. Remove them with
+`python scripts/seed.py --reset --allow-production` (it only deletes rows tied to those
+accounts) before a real launch, or change `PASSWORD` in `backend/scripts/seed.py` first.
 
 ## 3. Custom domain (optional, later)
 

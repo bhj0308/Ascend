@@ -155,6 +155,14 @@ uvicorn app.main:app --reload
 ```
 
 The API will be available at `http://localhost:8000`
+
+Seed a realistic demo dataset (10 accounts, 7 jobs, applications, contracts, mentorships,
+messages, payments) so every page has content:
+
+```bash
+python scripts/seed.py            # prints the demo accounts; all use password demo-pass-2026
+python scripts/seed.py --reset    # remove and recreate the demo rows
+```
 - API Docs (Swagger): `http://localhost:8000/docs`
 - ReDoc: `http://localhost:8000/redoc`
 
