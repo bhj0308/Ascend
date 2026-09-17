@@ -21,6 +21,9 @@ export interface User {
   created_at: string
 }
 
+// What `GET /profile/:id` returns about someone else — never their email.
+export type PublicUser = Omit<User, 'email'>
+
 export type JobType = 'full_time' | 'part_time' | 'contract' | 'internship'
 export type JobStatus = 'draft' | 'open' | 'closed' | 'filled'
 

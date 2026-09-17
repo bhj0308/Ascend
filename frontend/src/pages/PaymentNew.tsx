@@ -71,7 +71,7 @@ export function PaymentNew() {
   }
 
   const recipientLabel = recipient
-    ? [recipient.first_name, recipient.last_name].filter(Boolean).join(' ') || recipient.email
+    ? [recipient.first_name, recipient.last_name].filter(Boolean).join(' ') || `User #${recipient.id}`
     : undefined
 
   return (

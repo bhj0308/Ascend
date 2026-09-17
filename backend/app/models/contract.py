@@ -61,7 +61,7 @@ class Contract(BaseModel):
 
     # E-signature tracking
     docusign_envelope_id = Column(String(255), nullable=True)
-    signed_at = Column(DateTime, nullable=True)
+    signed_at = Column(DateTime(timezone=True), nullable=True)
 
     # Relationships
     application = relationship("Application", back_populates="contract")

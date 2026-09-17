@@ -11,9 +11,9 @@ function ApplicantRow({ application, jobId }: { application: Application; jobId:
     queryFn: () => getProfile(application.user_id),
   })
 
-  const name = applicant
-    ? `${applicant.first_name || ''} ${applicant.last_name || ''}`.trim() || applicant.email
-    : `Applicant #${application.user_id}`
+  const name =
+    (applicant && `${applicant.first_name || ''} ${applicant.last_name || ''}`.trim()) ||
+    `Applicant #${application.user_id}`
 
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-5">

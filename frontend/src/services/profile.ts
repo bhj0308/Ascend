@@ -1,7 +1,7 @@
 import { api } from './api'
-import type { User } from '@/types'
+import type { PublicUser } from '@/types'
 
-export async function getProfile(userId: number): Promise<User> {
-  const { data } = await api.get<User>(`/profile/${userId}`)
+export async function getProfile(userId: number): Promise<PublicUser> {
+  const { data } = await api.get<PublicUser>(`/profile/${userId}`)
   return data
 }

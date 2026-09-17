@@ -12,6 +12,7 @@ import {
 } from '@/services/contracts'
 import { PayUserButton } from '@/components/PayUserButton'
 import { useAuthStore } from '@/store/authStore'
+import { formatDateOnly } from '@/utils/dates'
 import { formatCents, isMoneyTerm, isNumericTerm } from '@/utils/money'
 import type { ContractStatus } from '@/types'
 
@@ -25,7 +26,7 @@ const STATUS_STYLES: Record<ContractStatus, string> = {
 function formatTermValue(term: string, value: unknown, currency: string): string {
   if (isMoneyTerm(term) && typeof value === 'number') return formatCents(value, currency)
   if (term.endsWith('_date') && typeof value === 'string' && value) {
-    return new Date(value).toLocaleDateString()
+    return formatDateOnly(value)
   }
   return String(value ?? '')
 }

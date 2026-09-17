@@ -152,8 +152,8 @@ def test_execute_payment_with_flag_off_returns_501_and_stays_pending(
     assert check.json()["status"] == "pending"
 
 
-def test_recipient_without_name_falls_back_to_email_local_part(client, founder):
-    """conftest always sets names; cover the blank-name display path explicitly."""
+def test_recipient_without_name_falls_back_to_user_id(client, founder):
+    """conftest always sets names; the blank-name path must never expose the email."""
     local_part = f"noname-{uuid4().hex[:8]}"
     signup = client.post(
         "/api/auth/signup",
@@ -167,4 +167,4 @@ def test_recipient_without_name_falls_back_to_email_local_part(client, founder):
 
     resp = _create_payment(client, founder, to_user_id=signup.json()["id"])
     assert resp.status_code == 201, resp.text
-    assert resp.json()["to_user_name"] == local_part
+    assert resp.json()["to_user_name"] == f"User #{signup.json()['id']}"

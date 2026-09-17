@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.dependencies import get_current_user
 from app.models.user import User
-from app.schemas.user import UserResponse, UserUpdate
+from app.schemas.user import PublicUserResponse, UserResponse, UserUpdate
 
 router = APIRouter()
 
@@ -32,9 +32,9 @@ def update_my_profile(
     return current_user
 
 
-@router.get("/{user_id}", response_model=UserResponse)
+@router.get("/{user_id}", response_model=PublicUserResponse)
 def get_public_profile(user_id: int, db: Session = Depends(get_db)):
-    """View another user's public profile."""
+    """View another user's public profile (never includes their email)."""
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")

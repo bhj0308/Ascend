@@ -229,17 +229,25 @@ Full schema: See `docs/DATABASE.md`
 - ✅ In-app messaging
 - ✅ Basic knowledge base
 
-### Phase 2: Employment Tooling (Weeks 7-12)
-- [ ] Contract template generation
-- [ ] E-signature integration
-- [ ] Tax/visa compliance checklists
-- [ ] Employment guides (Korea, Canada)
+### Phase 2: Employment Tooling
+- [x] Contract template generation (draft → send → sign/cancel, typed term validation)
+- [ ] E-signature integration — wired behind `ENABLE_DOCUSIGN`, needs credentials
+- [ ] Tax/visa compliance checklists — needs professional review
+- [ ] Employment guides (Korea, Canada) — placeholder page, needs professional review
 
-### Phase 3: Payments & Community (Weeks 13-18)
-- [ ] Wise payment integration
-- [ ] Invoicing system
-- [ ] Mentorship matching
+### Phase 3: Payments & Community
+- [x] Payment records (ledger) — real transfers behind `ENABLE_WISE_PAYMENTS`, needs credentials
+- [x] Mentorship requests (request → accept/decline → complete)
+- [x] In-app messaging (threads, polling)
+- [ ] Mentor directory — needs a `User` flag + migration
 - [ ] Community Slack/Discord
+
+### Launch readiness (no external input needed)
+- [x] Token refresh + session restore on reload
+- [x] Production config guards (`SECRET_KEY`, env-driven CORS/hosts)
+- [x] Render blueprint, CI, deploy guide — see `docs/DEPLOY.md`
+- [x] Draft Terms / Privacy pages (marked as unreviewed)
+- [ ] Password reset / email verification — needs an email provider
 
 ### Phase 4: Launch & Scale (Weeks 19-20+)
 - [ ] Analytics & monitoring
@@ -248,6 +256,11 @@ Full schema: See `docs/DATABASE.md`
 - [ ] Global expansion prep
 
 Full roadmap: See `docs/PRODUCT.html`
+
+## Deploy
+
+One-click Render blueprint (`render.yaml`) with managed Postgres; CI runs the test
+suite and frontend build on every push. Step-by-step: `docs/DEPLOY.md`.
 
 ## Contributing
 

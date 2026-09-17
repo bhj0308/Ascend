@@ -6,6 +6,7 @@ Ascend - Tech Talent Marketplace
 import logging
 from contextlib import asynccontextmanager
 
+import sentry_sdk
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
@@ -52,6 +53,14 @@ def create_app(settings: Settings = None) -> FastAPI:
     if settings is None:
         settings = get_settings()
 
+    # Error tracking is a no-op until a DSN is configured.
+    if settings.SENTRY_DSN:
+        sentry_sdk.init(
+            dsn=settings.SENTRY_DSN,
+            environment=settings.SENTRY_ENVIRONMENT,
+            traces_sample_rate=0.0,
+        )
+
     app = FastAPI(
         title="Ascend API",
         description="Tech talent marketplace connecting Korean-Canadian professionals with global talent",
@@ -64,7 +73,7 @@ def create_app(settings: Settings = None) -> FastAPI:
     # Middleware: CORS
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.CORS_ORIGINS,
+        allow_origins=settings.cors_origins_list,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -73,7 +82,7 @@ def create_app(settings: Settings = None) -> FastAPI:
     # Middleware: Trusted Host
     app.add_middleware(
         TrustedHostMiddleware,
-        allowed_hosts=settings.ALLOWED_HOSTS,
+        allowed_hosts=settings.allowed_hosts_list,
     )
 
     # Health check endpoint

@@ -71,7 +71,7 @@ export function MessageThread() {
   const headerName = isProfileNotFound
     ? 'User not found'
     : counterpart
-      ? [counterpart.first_name, counterpart.last_name].filter(Boolean).join(' ') || counterpart.email
+      ? [counterpart.first_name, counterpart.last_name].filter(Boolean).join(' ') || `User #${counterpart.id}`
       : ' '
 
   const sendErrorDetail = axios.isAxiosError(sendMutation.error)

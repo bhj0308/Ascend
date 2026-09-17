@@ -6,10 +6,17 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.dependencies import get_current_user
 from app.models.user import User
-from app.schemas.user import Token, UserCreate, UserLogin, UserResponse
+from app.schemas.user import (
+    RefreshRequest,
+    Token,
+    UserCreate,
+    UserLogin,
+    UserResponse,
+)
 from app.services.auth import (
     create_access_token,
     create_refresh_token,
+    decode_token,
     hash_password,
     verify_password,
 )
@@ -62,3 +69,28 @@ def login(payload: UserLogin, db: Session = Depends(get_db)):
 def get_me(current_user: User = Depends(get_current_user)):
     """Get the currently authenticated user."""
     return current_user
+
+
+@router.post("/refresh", response_model=Token)
+def refresh(payload: RefreshRequest, db: Session = Depends(get_db)):
+    """Exchange a valid refresh token for a new access + refresh token pair.
+
+    Tokens are stateless: there is no server-side revocation list yet, so a
+    refresh token stays valid until it expires (REFRESH_TOKEN_EXPIRE_DAYS).
+    """
+    data = decode_token(payload.refresh_token)
+    if data is None or data.get("type") != "refresh":
+        raise HTTPException(status_code=401, detail="Invalid or expired refresh token")
+
+    try:
+        user_id = int(data.get("sub"))
+    except (TypeError, ValueError):
+        user_id = None
+    user = db.query(User).filter(User.id == user_id).first() if user_id else None
+    if user is None:
+        raise HTTPException(status_code=401, detail="Invalid or expired refresh token")
+
+    return Token(
+        access_token=create_access_token(user.id),
+        refresh_token=create_refresh_token(user.id),
+    )

@@ -1,0 +1,62 @@
+# Render Blueprint — creates the managed Postgres, the FastAPI backend, and the
+# static frontend in one click: Render dashboard → New → Blueprint → this repo.
+# Spec: https://render.com/docs/blueprint-spec   Guide: docs/DEPLOY.md
+#
+# Free-tier notes (upgrade before real traffic):
+# - Free web services sleep after 15 min idle (first request is slow).
+# - Free Postgres expires after 90 days.
+# - preDeployCommand isn't available on free instances, so migrations run in
+#   startCommand. That's safe with a single instance; switch to preDeployCommand
+#   when you scale to more than one.
+
+databases:
+  - name: ascend-db
+    plan: free
+    databaseName: ascend
+    user: ascend
+
+services:
+  - type: web
+    name: ascend-api
+    runtime: python
+    rootDir: backend
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.2
+      - key: ENVIRONMENT
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ascend-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      # Must match the static site's URL below (update if you rename it or add a domain).
+      - key: CORS_ORIGINS
+        value: https://ascend-web.onrender.com
+      - key: ALLOWED_HOSTS
+        value: ascend-api.onrender.com,localhost
+      # Optional integrations — set in the dashboard when you have them; blank = disabled.
+      - key: SENTRY_DSN
+        sync: false
+      - key: SENTRY_ENVIRONMENT
+        value: production
+
+  - type: web
+    name: ascend-web
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    # SPA: every path is served by index.html so React Router handles it.
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: https://ascend-api.onrender.com/api

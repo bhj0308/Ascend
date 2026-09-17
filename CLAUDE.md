@@ -19,14 +19,15 @@ Keep this file short — it loads every session. Long workflows live in
 - **Done, tested:** auth, profiles, jobs CRUD + filters, applications pipeline, **contracts**
   (templates → draft → send → sign/cancel, typed terms), **payments** (ledger only — `execute`
   is 501 until Wise is wired), **mentorships** (request → accept/decline → complete),
-  **messages** (threads + per-user history, mark-read on open, polling). 34 API paths.
+  **messages** (threads + per-user history, mark-read on open, polling), token refresh. 35 API paths.
   Every model has routes. `backend/tests/` is a real-Postgres pytest harness (`ascend_test`
-  DB on the `.env` host) — 56 tests. Add to it; don't verify by hand. New resource pattern:
+  DB on the `.env` host) — 66 tests. Add to it; don't verify by hand. New resource pattern:
   `routes/contracts.py` + `tests/routes/test_contracts.py`.
-- Frontend (19 routes): Home, Jobs, JobDetail, JobNew, JobApplicants (names → `/users/:id`),
+- Frontend (21 routes): Home, Jobs, JobDetail, JobNew, JobApplicants (names → `/users/:id`),
   Contracts/ContractNew/ContractDetail (+ "Record payment" for founder), Payments/PaymentNew/
   PaymentDetail (ledger-only banner), Mentorships, PublicProfile `/users/:id` (request mentorship
-  + message), Messages/MessageThread (polling 15s/5s), Login, Signup, Profile, Guides (placeholder).
+  + message), Messages/MessageThread (polling 15s/5s), Login, Signup, Profile, Guides (placeholder),
+  Terms/Privacy (drafts, marked). `App.tsx` `AuthBootstrap` restores the session on reload.
   Per-resource types live in `src/types/<resource>.ts`; shared `User`/`Job`/`Application` in `types/index.ts`.
 
 ## Run / verify
@@ -37,6 +38,7 @@ cd frontend && npm run build                                              # tsc 
 cd backend && black app/ tests/ && isort app/ tests/                       # must be clean
 cd backend && pytest -q                                                   # needs ascend_test DB
 ```
+Deploy: `render.yaml` + `docs/DEPLOY.md` (Render blueprint, migrations at start, CI in `.github/`).
 DB URL comes from `backend/.env` (gitignored; copy from `.env.example`). Full setup: `docs/SETUP.md`.
 
 ## Hard-won gotchas
@@ -48,6 +50,16 @@ DB URL comes from `backend/.env` (gitignored; copy from `.env.example`). Full se
 - Money is integer **cents** (`salary_min`, `amount`) + ISO currency code. No floats.
 - Passwords: `bcrypt` directly (no passlib). Public `UserResponse` must never include `password_hash`.
 - Python is 3.13 here; pin deps to versions with 3.13 wheels.
+- `ENVIRONMENT=production` refuses to start with the default/short `SECRET_KEY`. `CORS_ORIGINS`
+  and `ALLOWED_HOSTS` are comma-separated strings (`settings.cors_origins_list`).
+- Access tokens last 30 min; `frontend/src/services/api.ts` refreshes once on 401 then retries.
+  Refresh tokens are stateless (no revocation list).
+- Timestamps are timezone-aware UTC (`DateTime(timezone=True)`, `_utcnow()` in `models/base.py`);
+  never use `datetime.utcnow()`. Date-only strings (contract `*_date` terms) must be formatted
+  with `frontend/src/utils/dates.ts::formatDateOnly`, not `new Date(str)` (off-by-one west of UTC).
+- `display_name()` falls back to `User #<id>`, never the email/local-part.
+- `GET /profile/{id}` returns `PublicUserResponse` — never email. Only `/profile/me` and
+  `/auth/me` include it. Don't display emails as name fallbacks.
 
 ## Rules
 - Never commit `.env`, `venv/`, `node_modules/`, `dist/`.

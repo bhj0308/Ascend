@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import List, Optional
 
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 from app.models.user import UserStatus, UserType
 
@@ -22,7 +22,7 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     """Fields required to create a user via email/password signup."""
 
-    password: str
+    password: str = Field(min_length=8)
 
 
 class UserCreateOAuth(UserBase):
@@ -64,6 +64,26 @@ class UserResponse(UserBase):
     created_at: datetime
 
 
+class PublicUserResponse(BaseModel):
+    """What other signed-in users may see. Deliberately omits email and phone."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    user_type: UserType
+    country: Optional[str] = None
+    city: Optional[str] = None
+    avatar_url: Optional[str] = None
+    bio: Optional[str] = None
+    skills: Optional[List[str]] = None
+    languages: Optional[List[str]] = None
+    visa_status: Optional[str] = None
+    status: UserStatus
+    created_at: datetime
+
+
 class UserLogin(BaseModel):
     """Login credentials."""
 
@@ -77,3 +97,9 @@ class Token(BaseModel):
     access_token: str
     refresh_token: str
     token_type: str = "bearer"
+
+
+class RefreshRequest(BaseModel):
+    """Body for POST /auth/refresh."""
+
+    refresh_token: str

@@ -1,6 +1,6 @@
 """Contract routes: templates, generation, and the send/sign/cancel lifecycle."""
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -228,7 +228,7 @@ def sign_contract(
         )
 
     contract.status = ContractStatus.SIGNED
-    contract.signed_at = datetime.utcnow()
+    contract.signed_at = datetime.now(timezone.utc)
     db.commit()
     db.refresh(contract)
     return build_contract_response(contract)

@@ -9,7 +9,7 @@ from app.models.base import Base
 settings = get_settings()
 
 engine = create_engine(
-    settings.DATABASE_URL,
+    settings.database_url,
     pool_size=settings.DATABASE_POOL_SIZE,
     max_overflow=settings.DATABASE_MAX_OVERFLOW,
     pool_timeout=settings.DATABASE_POOL_TIMEOUT,

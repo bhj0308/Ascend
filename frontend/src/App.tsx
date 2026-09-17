@@ -19,10 +19,33 @@ import { PaymentNew } from '@/pages/PaymentNew'
 import { PaymentDetail } from '@/pages/PaymentDetail'
 import { Messages } from '@/pages/Messages'
 import { MessageThread } from '@/pages/MessageThread'
+import { Terms } from '@/pages/Terms'
+import { Privacy } from '@/pages/Privacy'
+import { Footer } from '@/components/Footer'
+import { useEffect } from 'react'
+import { getMe } from '@/services/auth'
+import { useAuthStore } from '@/store/authStore'
+
+// On a full page load, restore the signed-in user from the stored token so the
+// UI doesn't render as logged-out while a valid session exists. A 401 here is
+// handled by the api interceptor (refresh, or clear the session).
+function AuthBootstrap() {
+  const setUser = useAuthStore((s) => s.setUser)
+  useEffect(() => {
+    if (!localStorage.getItem('access_token')) return
+    getMe()
+      .then(setUser)
+      .catch(() => {
+        /* session already cleared by the interceptor */
+      })
+  }, [setUser])
+  return null
+}
 
 export function App() {
   return (
     <BrowserRouter>
+      <AuthBootstrap />
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
@@ -44,7 +67,10 @@ export function App() {
         <Route path="/payments/:id" element={<PaymentDetail />} />
         <Route path="/messages" element={<Messages />} />
         <Route path="/messages/:userId" element={<MessageThread />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
       </Routes>
+      <Footer />
     </BrowserRouter>
   )
 }
