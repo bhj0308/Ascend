@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.dependencies import get_current_user
+from app.dependencies import get_current_user, get_verified_user
 from app.models.application import Application
 from app.models.job import Job
 from app.models.user import User
@@ -22,7 +22,7 @@ router = APIRouter()
 @router.post("", response_model=ApplicationResponse, status_code=201)
 def apply_to_job(
     payload: ApplicationCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     """Apply to a job posting."""

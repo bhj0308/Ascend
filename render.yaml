@@ -46,6 +46,10 @@ services:
       # CORS_ORIGINS (the static site's real URL) — update both together.
       - key: APP_BASE_URL
         value: https://ascend-web-irk7.onrender.com
+      # Turn this to "true" the moment SENDGRID_API_KEY is set. Until then verification
+      # links only reach the API log, so enforcing it would lock real users out.
+      - key: REQUIRE_EMAIL_VERIFICATION
+        value: "false"
       # Optional integrations — set in the dashboard when you have them; blank = disabled.
       # Without SENDGRID_API_KEY, emails are printed to the API's log instead of sent.
       - key: SENDGRID_API_KEY

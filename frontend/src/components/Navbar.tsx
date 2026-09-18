@@ -48,6 +48,11 @@ export function Navbar() {
           <Link to="/messages" className={linkCls} onClick={close}>
             Messages
           </Link>
+          {user?.user_type === 'admin' && (
+            <Link to="/admin" className={linkCls} onClick={close}>
+              Moderation
+            </Link>
+          )}
           <Link to="/profile" className={linkCls} onClick={close}>
             {user?.first_name || 'Profile'}
           </Link>

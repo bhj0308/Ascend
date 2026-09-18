@@ -55,6 +55,12 @@ Response:
 { "access_token": "...", "refresh_token": "...", "token_type": "bearer" }
 ```
 
+Write actions that reach other users — `POST /jobs`, `POST /applications`, `POST /messages`,
+`POST /mentorships` — require a **verified email** and return **403** `{"detail": "Verify your
+email address before doing this"}` otherwise. The check is skipped when
+`REQUIRE_EMAIL_VERIFICATION=false` (the default in production until SendGrid is configured).
+Reading, profile edits and account deletion are never gated.
+
 ## Profile
 
 | Method | Path | Auth | Description |
@@ -137,6 +143,24 @@ Plain HTTP; clients poll. No websockets in this version.
 | POST | `/messages` | required | Send a message; sender = current user. 404 if `recipient_id` or optional `job_id` doesn't exist; 400 if sending to yourself, if the recipient's account is no longer active, or the body is empty/whitespace. |
 | GET | `/messages/threads` | required | One summary per user you've exchanged messages with: `user_id`, `user_name`, `last_message_body`, `last_message_at`, `unread_count`; newest first. |
 | GET | `/messages/with/{user_id}` | required | Full history with that user, oldest first. 404 if the user doesn't exist. Side effect: marks their unread messages to you as read. Any user may open an (empty) thread with any existing user. |
+
+## Admin
+
+Moderation endpoints. `user_type: admin` is refused at signup (422) and can't be set from
+`PUT /profile/me` — grant it with `backend/scripts/make_admin.py`. Non-admins get **403**
+`{"detail": "Admin access required"}`.
+
+| Method | Path | Description |
+|---|---|---|
+| GET | `/admin/users` | List users newest-first, with emails. `q` matches email/first/last name, `limit` 1-200 (default 50). |
+| POST | `/admin/users/{user_id}/suspend` | Set status `suspended` and close the user's open jobs. 400 suspending yourself or an already-deleted account, 404 unknown. |
+| POST | `/admin/users/{user_id}/unsuspend` | `suspended` → `active`. 400 if the account isn't suspended. Jobs closed by the suspension stay closed. |
+| GET | `/admin/jobs` | List jobs in every status (browse shows only open). `q` matches title/company. |
+| POST | `/admin/jobs/{job_id}/close` | Take a job off the board, keeping its applications. 400 if already closed, 404 unknown. |
+
+A suspended user can't sign in: `POST /auth/login` returns **403** `{"detail": "This account has
+been suspended"}`, and existing tokens stop working because `get_current_user` requires an
+active account.
 
 ## Not yet implemented (see docs/PRODUCT.html for roadmap)
 

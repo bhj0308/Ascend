@@ -15,6 +15,8 @@ import app.models  # noqa: F401  (registers all mapped classes on Base)
 from app.database import get_db
 from app.main import app
 from app.models.base import Base
+from app.models.user import User, UserType
+from app.services.auth import create_email_verify_token
 
 TEST_DATABASE_URL = os.environ.get(
     "TEST_DATABASE_URL", "postgresql://postgres@localhost:5433/ascend_test"
@@ -55,7 +57,9 @@ def _unique_email(prefix: str) -> str:
     return f"{prefix}-{time.time_ns()}@example.com"
 
 
-def _signup_and_login(client: TestClient, user_type: str) -> dict:
+def _signup_and_login(
+    client: TestClient, user_type: str, verified: bool = True
+) -> dict:
     email = _unique_email(user_type)
     password = "hunter22"
     signup_resp = client.post(
@@ -78,7 +82,19 @@ def _signup_and_login(client: TestClient, user_type: str) -> dict:
     assert login_resp.status_code == 200, login_resp.text
     token = login_resp.json()["access_token"]
 
-    return {"headers": {"Authorization": f"Bearer {token}"}, "user_id": user_id}
+    if verified:
+        verify_resp = client.post(
+            "/api/auth/verify-email",
+            json={"token": create_email_verify_token(user_id)},
+        )
+        assert verify_resp.status_code == 200, verify_resp.text
+
+    return {
+        "headers": {"Authorization": f"Bearer {token}"},
+        "user_id": user_id,
+        "email": email,
+        "password": password,
+    }
 
 
 @pytest.fixture()
@@ -97,3 +113,23 @@ def applicant(client):
 def other_user(client):
     """A third, unrelated signed-up + logged-in user."""
     return _signup_and_login(client, "engineer")
+
+
+@pytest.fixture()
+def unverified_user(client):
+    """A signed-up user who never clicked the verification link."""
+    return _signup_and_login(client, "engineer", verified=False)
+
+
+@pytest.fixture()
+def admin(client):
+    """An admin account, promoted in the DB — signup refuses user_type=admin."""
+    data = _signup_and_login(client, "founder")
+    db = TestingSessionLocal()
+    try:
+        user = db.query(User).filter(User.id == data["user_id"]).first()
+        user.user_type = UserType.ADMIN
+        db.commit()
+    finally:
+        db.close()
+    return data

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import { createJob } from '@/services/jobs'
+import { describeError } from '@/utils/errors'
 import type { Job } from '@/types'
 
 export function JobNew() {
@@ -117,7 +118,9 @@ export function JobNew() {
           {mutation.isPending ? 'Posting…' : 'Post Job'}
         </button>
         {mutation.isError && (
-          <p className="text-sm text-red-600">Could not post job. Are you logged in as a founder?</p>
+          <p className="text-sm text-red-600">
+            {describeError(mutation.error, 'Could not post job.')}
+          </p>
         )}
       </form>
     </div>

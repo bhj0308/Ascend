@@ -51,6 +51,7 @@ console and blank pages.
 | `SENDGRID_API_KEY` | API | optional; **blank = emails are printed to the API log instead of sent** (find reset links there) |
 | `SENDGRID_FROM_EMAIL` | API | sender address once SendGrid is configured (must be a verified sender there) |
 | `RATE_LIMIT_ENABLED` | API | default `true`; only tests set it to `false` |
+| `REQUIRE_EMAIL_VERIFICATION` | API | `false` in the blueprint; set to `true` once SendGrid works (see §2c) |
 | `SENTRY_DSN` | API | optional; blank disables error tracking |
 
 Placeholders that are wired but inert until you add credentials:
@@ -88,6 +89,42 @@ after clicking around, and how to lock or remove them before a real launch:
 
 If the External Database URL ever changes (password rotation, a new database), update only
 `backend/.env.render.local`.
+
+## 2c. Turn on the email-verification gate
+
+Posting a job, applying, messaging and requesting mentorship require a verified email —
+but only when `REQUIRE_EMAIL_VERIFICATION` is `true`. The blueprint ships it **false**,
+because without an email provider the verification link only reaches the API log and real
+users would be locked out.
+
+Once `SENDGRID_API_KEY` and `SENDGRID_FROM_EMAIL` are set and you've confirmed a real
+signup receives the email:
+
+1. Render → `ascend-api` → **Environment** → `REQUIRE_EMAIL_VERIFICATION` = `true`.
+2. Save (the service restarts itself), then sign up with a throwaway address and confirm
+   posting a job is refused until you click the link.
+
+Existing accounts that never verified will be blocked from those four actions until they
+use the **Resend** button in the yellow banner.
+
+## 2d. Make yourself an admin
+
+Admin can't be self-assigned: signup rejects `user_type: admin` and the profile editor can't
+set it. Grant it from your laptop, the same way you seed:
+
+```bash
+cd backend && source venv/bin/activate
+python scripts/make_admin.py you@example.com --render    # --render uses .env.render.local
+```
+
+Sign out and back in, then open **/admin** (a "Moderation" link appears in the nav) to:
+
+- **Suspend** an account — blocks sign-in with a clear message, kills their current session,
+  and closes their open jobs. Their contracts, payments and messages stay for counterparties.
+- **Unsuspend** — restores access. Jobs closed by the suspension stay closed.
+- **Close** any job — takes it off the board while keeping its applications.
+
+To step back down: `python scripts/make_admin.py you@example.com --type founder --render`.
 
 ## 3. Custom domain (optional, later)
 

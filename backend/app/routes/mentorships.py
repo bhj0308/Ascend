@@ -7,7 +7,7 @@ from sqlalchemy import and_, or_
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.dependencies import get_current_user
+from app.dependencies import get_current_user, get_verified_user
 from app.models.mentorship import Mentorship, MentorshipStatus
 from app.models.user import User, UserStatus
 from app.schemas.mentorship import (
@@ -87,7 +87,7 @@ def list_mentors(
 @router.post("", response_model=MentorshipResponse, status_code=201)
 def create_mentorship(
     payload: MentorshipCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     """Request a mentorship. The current user becomes the mentee.

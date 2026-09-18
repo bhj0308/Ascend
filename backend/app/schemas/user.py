@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import List, Optional
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 from app.models.user import UserStatus, UserType
 
@@ -19,10 +19,19 @@ class UserBase(BaseModel):
     city: Optional[str] = None
 
 
+def _reject_self_assigned_admin(value: UserType) -> UserType:
+    """Admin is granted out-of-band (scripts/make_admin.py), never by signing up."""
+    if value == UserType.ADMIN:
+        raise ValueError("user_type 'admin' cannot be self-assigned")
+    return value
+
+
 class UserCreate(UserBase):
     """Fields required to create a user via email/password signup."""
 
     password: str = Field(min_length=8)
+
+    _no_admin = field_validator("user_type")(_reject_self_assigned_admin)
 
 
 class UserCreateOAuth(UserBase):
@@ -30,6 +39,8 @@ class UserCreateOAuth(UserBase):
 
     google_id: str
     avatar_url: Optional[str] = None
+
+    _no_admin = field_validator("user_type")(_reject_self_assigned_admin)
 
 
 class UserUpdate(BaseModel):

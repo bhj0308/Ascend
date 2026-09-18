@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { getJob, applyToJob } from '@/services/jobs'
+import { describeError } from '@/utils/errors'
 import { useAuthStore } from '@/store/authStore'
 
 export function JobDetail() {
@@ -63,7 +64,7 @@ export function JobDetail() {
             </button>
             {applyMutation.isError && (
               <p className="mt-2 text-sm text-red-600">
-                Could not submit application. Have you already applied?
+                {describeError(applyMutation.error, 'Could not submit application.')}
               </p>
             )}
           </>

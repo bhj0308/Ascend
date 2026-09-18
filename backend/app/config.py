@@ -52,6 +52,11 @@ class Settings(BaseSettings):
     )
     ALLOWED_HOSTS: str = "localhost,127.0.0.1,*.onrender.com,*.ascendtalent.com"
 
+    # Require a verified email before a user can post jobs, apply, message, or
+    # request mentorship. Keep this false until an email provider is configured —
+    # without one, verification links only reach the API log and users would be stuck.
+    REQUIRE_EMAIL_VERIFICATION: bool = True
+
     # Email / SendGrid
     SENDGRID_API_KEY: str = ""
     SENDGRID_FROM_EMAIL: str = "noreply@ascendtalent.com"

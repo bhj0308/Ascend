@@ -11,7 +11,7 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.dependencies import get_current_user
+from app.dependencies import get_current_user, get_verified_user
 from app.models.job import Job
 from app.models.message import Message
 from app.models.user import User, UserStatus
@@ -28,7 +28,7 @@ router = APIRouter()
 @router.post("", response_model=MessageResponse, status_code=201)
 def send_message(
     payload: MessageCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     """Send a message. The current user is always the sender.

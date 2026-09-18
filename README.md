@@ -30,6 +30,7 @@ Ascend connects:
 | Area | What works | What's still a placeholder |
 |---|---|---|
 | Auth | Signup/login, JWT access + refresh, session restore, password reset, email verification, rate limiting on `/auth/*` | Emails print to the API log until `SENDGRID_API_KEY` is set; Google OAuth not wired |
+| Moderation | Admin-only: suspend/unsuspend accounts (closes their open jobs, blocks sign-in), close any job. Email-verification gate on posting, applying, messaging and mentorship requests | Off in production until email delivery works (`REQUIRE_EMAIL_VERIFICATION`); no audit log or reporting flow |
 | Profiles | Editor, public profiles (no email exposed), mentor opt-in, anonymizing account deletion | Avatars |
 | Jobs | CRUD, visa/IEC/remote filters, applications pipeline (applied → hired) | Search beyond filters |
 | Contracts | 5 templates with validated terms, draft → send → sign / cancel | DocuSign (`ENABLE_DOCUSIGN`); in-app signing is an acknowledgment, not a legal e-signature |
@@ -39,7 +40,7 @@ Ascend connects:
 | Guides | Page with topic outlines | Real content (needs professional review) |
 | Landing | Animated KO/EN landing page with live open-roles feed | — |
 
-Numbers: 40 API paths (46 operations), 25 frontend routes, 91 backend tests.
+Numbers: 45 API paths (51 operations), 26 frontend routes, 112 backend tests.
 
 ## Tech stack (what's actually in use)
 
@@ -137,6 +138,7 @@ To seed the live site from your laptop: [docs/DEPLOY.md §2b](docs/DEPLOY.md).
 | `/payments` | record, list, cancel; `execute` is 501 until Wise |
 | `/mentorships` | mentor directory, request, accept/decline/complete |
 | `/messages` | threads, history with a user (marks read), send |
+| `/admin` | admin-only: list/suspend/unsuspend users, list/close jobs |
 
 Every endpoint with its error cases: [docs/API.md](docs/API.md). Swagger UI at `/docs` (disabled in production).
 

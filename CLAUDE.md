@@ -21,16 +21,17 @@ Keep this file short — it loads every session. Long workflows live in
   is 501 until Wise is wired), **mentorships** (request → accept/decline → complete),
   **messages** (threads + per-user history, mark-read on open, polling), token refresh,
   password reset + email verification, rate limiting on `/auth/*`, account deletion
-  (anonymizing), mentor directory. 40 API paths.
+  (anonymizing), mentor directory, **email-verification gate** on the four write routes that
+  reach other users, **admin moderation** (suspend/unsuspend users, close jobs). 45 API paths.
   Every model has routes. `backend/tests/` is a real-Postgres pytest harness (`ascend_test`
-  via `TEST_DATABASE_URL`, default `localhost:5433`) — 91 tests. Add to it; don't verify by hand. New resource pattern:
+  via `TEST_DATABASE_URL`, default `localhost:5433`) — 112 tests. Add to it; don't verify by hand. New resource pattern:
   `routes/contracts.py` + `tests/routes/test_contracts.py`.
-- Frontend (25 routes): Landing `/` (KO/EN toggle, copy in `src/content/landing.ts`; animated hero,
+- Frontend (26 routes): Landing `/` (KO/EN toggle, copy in `src/content/landing.ts`; animated hero,
   live open-roles marquee from `GET /jobs`, scroll reveals via `src/hooks/useReveal.ts`), Jobs, JobDetail, JobNew, JobApplicants (names → `/users/:id`),
   Contracts/ContractNew/ContractDetail (+ "Record payment" for founder), Payments/PaymentNew/
   PaymentDetail (ledger-only banner), Mentorships, Mentors `/mentors` (directory), PublicProfile `/users/:id` (request mentorship
   + message), Messages/MessageThread (polling 15s/5s), Login (+ forgot/reset password), Signup, VerifyEmail, Profile (editor, mentor toggle,
-  delete account), Guides (placeholder),
+  delete account), Admin `/admin` (moderation, admins only), Guides (placeholder),
   Terms/Privacy (drafts, marked). `App.tsx` `AuthBootstrap` restores the session on reload.
   Per-resource types live in `src/types/<resource>.ts`; shared `User`/`Job`/`Application` in `types/index.ts`.
 
@@ -75,6 +76,13 @@ DB URL comes from `backend/.env` (gitignored; copy from `.env.example`). Full se
 - Landing motion is Tailwind keyframes (`tailwind.config.js`) + `.reveal` in `styles/index.css`, all
   disabled under `prefers-reduced-motion`. Use `overflow-clip`, not `overflow-hidden`, on containers
   with bleeding decorations — `hidden` still scrolls programmatically (focus shifted the hero 96px).
+- `POST /jobs|applications|messages|mentorships` use `get_verified_user` (403 unless
+  `email_verified`), switchable via `REQUIRE_EMAIL_VERIFICATION` — **false in production until
+  SendGrid is configured**, or users can't get the link and are stuck. Reads are never gated.
+- `user_type: admin` is refused at signup (schema validator) and absent from `UserUpdate`.
+  Grant it with `python scripts/make_admin.py <email> [--render]`. Admin routes use
+  `get_admin_user`. Suspending sets status `suspended`, closes the user's open jobs, and login
+  returns 403 — `get_current_user` already rejects non-active accounts.
 - `GET /profile/{id}` returns `PublicUserResponse` — never email. Only `/profile/me` and
   `/auth/me` include it. Don't display emails as name fallbacks.
 

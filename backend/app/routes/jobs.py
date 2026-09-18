@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.dependencies import get_current_user
+from app.dependencies import get_current_user, get_verified_user
 from app.models.job import Job, JobStatus
 from app.models.user import User
 from app.schemas.job import JobCreate, JobResponse, JobUpdate
@@ -47,7 +47,7 @@ def browse_jobs(
 @router.post("", response_model=JobResponse, status_code=201)
 def create_job(
     payload: JobCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     """Create a new job posting."""

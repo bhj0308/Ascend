@@ -15,6 +15,7 @@ from slowapi.errors import RateLimitExceeded
 
 from app.config import Settings, get_settings
 from app.routes import (
+    admin,
     applications,
     auth,
     contracts,
@@ -143,6 +144,7 @@ def create_app(settings: Settings = None) -> FastAPI:
     )
     app.include_router(messages.router, prefix="/api/messages", tags=["Messages"])
     app.include_router(contracts.router, prefix="/api/contracts", tags=["Contracts"])
+    app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
 
     logger.info(f"✅ FastAPI app configured for {settings.ENVIRONMENT} environment")
     return app

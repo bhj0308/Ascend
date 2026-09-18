@@ -27,6 +27,7 @@ import { ForgotPassword } from '@/pages/ForgotPassword'
 import { ResetPassword } from '@/pages/ResetPassword'
 import { VerifyEmail } from '@/pages/VerifyEmail'
 import { Mentors } from '@/pages/Mentors'
+import { Admin } from '@/pages/Admin'
 import { useEffect } from 'react'
 import { getMe } from '@/services/auth'
 import { useAuthStore } from '@/store/authStore'
@@ -79,6 +80,7 @@ export function App() {
         <Route path="/messages/:userId" element={<MessageThread />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
+        <Route path="/admin" element={<Admin />} />
       </Routes>
       <Footer />
     </BrowserRouter>

@@ -4,8 +4,9 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
+from app.config import get_settings
 from app.database import get_db
-from app.models.user import User, UserStatus
+from app.models.user import User, UserStatus, UserType
 from app.services.auth import decode_token
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
@@ -40,3 +41,27 @@ def get_current_user(
         raise credentials_exception
 
     return user
+
+
+def get_verified_user(current_user: User = Depends(get_current_user)) -> User:
+    """Require a verified email for actions that reach other users.
+
+    Gated by REQUIRE_EMAIL_VERIFICATION: with no email provider configured the
+    verification link only reaches the API log, so enforcing it would lock
+    legitimate users out of the app entirely.
+    """
+    if get_settings().REQUIRE_EMAIL_VERIFICATION and not current_user.email_verified:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Verify your email address before doing this",
+        )
+    return current_user
+
+
+def get_admin_user(current_user: User = Depends(get_current_user)) -> User:
+    """Require an admin account. Granted only by scripts/make_admin.py."""
+    if current_user.user_type != UserType.ADMIN:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required"
+        )
+    return current_user

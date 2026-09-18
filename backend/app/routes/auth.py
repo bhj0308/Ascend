@@ -92,6 +92,10 @@ def login(request: Request, payload: UserLogin, db: Session = Depends(get_db)):
         or not verify_password(payload.password, user.password_hash)
     ):
         raise HTTPException(status_code=401, detail="Incorrect email or password")
+    if user.status == UserStatus.SUSPENDED:
+        raise HTTPException(status_code=403, detail="This account has been suspended")
+    if user.status != UserStatus.ACTIVE:
+        raise HTTPException(status_code=401, detail="Incorrect email or password")
 
     return Token(
         access_token=create_access_token(user.id),
