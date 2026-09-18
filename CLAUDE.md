@@ -42,6 +42,7 @@ cd frontend && npm run build                                              # tsc 
 cd backend && black app/ tests/ && isort app/ tests/                       # must be clean
 cd backend && pytest -q                                                   # needs ascend_test DB
 cd backend && python scripts/seed.py [--reset]                            # demo data via the real API
+backend/scripts/seed_render.sh [--reset]                                   # same, against Render (URL in git-ignored backend/.env.render.local)
 ```
 Deploy: `render.yaml` + `docs/DEPLOY.md` (Render blueprint, migrations at start, CI in `.github/`).
 DB URL comes from `backend/.env` (gitignored; copy from `.env.example`). Full setup: `docs/SETUP.md`.

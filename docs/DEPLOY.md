@@ -59,19 +59,35 @@ Placeholders that are wired but inert until you add credentials:
 
 ## 2b. Demo data on the live site (optional)
 
-To make the MVP interactable for visitors, seed the demo dataset from Render → `ascend-api`
-→ **Shell**:
+Render Shell needs a paid instance, so seed **from your laptop** against Render's database
+instead. The script talks to Postgres directly and calls the API in-process, so nothing has to
+run on Render.
+
+One-time setup:
+
+1. Render → `ascend-db` → **Connections** → copy the **External Database URL**.
+2. `cp backend/.env.render.example backend/.env.render.local` and paste it as
+   `RENDER_DATABASE_URL`. That file is git-ignored (`.env.*.local`) — it holds the production
+   database password, so never commit it, paste it into docs, or share it.
+
+Then, from the repo:
 
 ```bash
-python scripts/seed.py --allow-production
+backend/scripts/seed_render.sh           # create ten demo accounts + jobs, contracts, messages, ...
+backend/scripts/seed_render.sh --reset   # delete the demo rows and recreate them
 ```
 
-It creates ten `@example.com` accounts (founders, engineers, IEC holders, an immigrant) with
-jobs, applications, contracts, mentorships, messages and payment records, and prints the
-logins. **They all share the password `demo-pass-2026`**, so anyone who reads this repo can
-sign in as them — fine for a demo, not once real users depend on the site. Remove them with
-`python scripts/seed.py --reset --allow-production` (it only deletes rows tied to those
-accounts) before a real launch, or change `PASSWORD` in `backend/scripts/seed.py` first.
+The wrapper sets `DATABASE_URL`, `ENVIRONMENT=production`, a throwaway `SECRET_KEY` (only to
+pass the production startup guard — demo logins are bcrypt hashes and work on the live site), and
+`--allow-production`. Without `--reset` it refuses if demo data already exists, so a plain run is
+a safe connectivity check.
+
+**All demo accounts share the password `demo-pass-2026`** — which login shows what, how to reset
+after clicking around, and how to lock or remove them before a real launch:
+[DEMO_ACCOUNTS.md](./DEMO_ACCOUNTS.md).
+
+If the External Database URL ever changes (password rotation, a new database), update only
+`backend/.env.render.local`.
 
 ## 3. Custom domain (optional, later)
 
@@ -100,5 +116,6 @@ tested downgrade path.
   stays valid until it expires (7 days). Add a revocation table before handling anything sensitive.
 - **Rate limiting is in-memory** — fine for the single free-tier instance; move it to Redis
   before running more than one instance.
-- **Free tier**: API sleeps when idle; Postgres expires after 90 days; single instance only.
+- **Free tier**: API sleeps when idle; free Postgres databases expire (check the date on
+  `ascend-db`'s page and move to a paid plan or another Postgres before then); single instance only.
 - Terms and Privacy pages are drafts marked as such in the UI.

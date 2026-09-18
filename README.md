@@ -82,7 +82,7 @@ Ascend/
 │       ├── types/           # Mirrors backend schemas
 │       ├── utils/           # money + date formatting
 │       └── styles/          # Tailwind entry + animation utilities
-├── docs/                    # ARCHITECTURE, API, DATABASE, SETUP, DEPLOY, PRODUCT.html
+├── docs/                    # ARCHITECTURE, API, DATABASE, SETUP, DEPLOY, DEMO_ACCOUNTS, PRODUCT.html
 ├── .claude/                 # Claude Code agents + skills (/feature, /add-resource, /migrate, /smoke-test)
 ├── render.yaml              # Render blueprint
 └── docker-compose.yml       # Optional local containers
@@ -120,7 +120,8 @@ python scripts/seed.py --reset    # remove and recreate the demo rows
 ```
 
 Try `jihoon@example.com` (founder with applicants and contracts) or `yuna@example.com`
-(IEC engineer with a contract to sign).
+(IEC engineer with a contract to sign). What every account shows: [docs/DEMO_ACCOUNTS.md](docs/DEMO_ACCOUNTS.md).
+To seed the live site from your laptop: [docs/DEPLOY.md §2b](docs/DEPLOY.md).
 
 ## API overview
 
